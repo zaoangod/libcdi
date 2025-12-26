@@ -163,19 +163,19 @@ int main(int argc, char* argv[])
 			DISK_VOL_INFO* p = &pdInfo[i].VolInfo[j];
 			printf("\t%s\n", Ucs2ToUtf8(p->VolPath));
 
-			printf("\t\tStarting LBA: %llu\n", p->StartLba);
-			printf("\t\tPartition Number: %lu\n", p->PartNum);
-			printf("\t\tPartition Type: %s\n", Ucs2ToUtf8(p->PartType));
-			printf("\t\tPartition ID: %s\n", Ucs2ToUtf8(p->PartId));
-			printf("\t\tBoot Indicator: %s\n", p->BootIndicator ? "Yes" : "No");
-			printf("\t\tPartition Flag: %s\n", Ucs2ToUtf8(p->PartFlag));
+			printf("\"StartLBA\": %llu\n", p->StartLba);
+			printf("\"PartitionNumber\": %lu\n", p->PartNum);
+			printf("\"PartitionType\": \"%s\",\n", Ucs2ToUtf8(p->PartType));
+			printf("\"PartitionID\": \"%s\",\n", Ucs2ToUtf8(p->PartId));
+			printf("\"BootIndicator\": \"%s\",\n", p->BootIndicator ? "Yes" : "No");
+			printf("\"PartitionFlag\": \"%s\",\n", Ucs2ToUtf8(p->PartFlag));
 
-			printf("\t\tLabel: %s\n", Ucs2ToUtf8(p->VolLabel));
-			printf("\t\tFS: %s\n", Ucs2ToUtf8(p->VolFs));
-			printf("\t\tFree Space: %s\n", GetHumanSize(p->VolFreeSpace.QuadPart, 1024));
-			printf("\t\tTotal Space: %s\n", GetHumanSize(p->VolTotalSpace.QuadPart, 1024));
-			printf("\t\tUsage: %.2f%%\n", p->VolUsage);
-			printf("\t\tMount Points:\n");
+			printf("\"Label\": \"%s\",\n", Ucs2ToUtf8(p->VolLabel));
+			printf("\"FS\": \"%s\",\n", Ucs2ToUtf8(p->VolFs));
+			printf("\"FreeSpace\": \"%s\",\n", GetHumanSize(p->VolFreeSpace.QuadPart, 1024));
+			printf("\"TotalSpace\": \"%s\",\n", GetHumanSize(p->VolTotalSpace.QuadPart, 1024));
+			printf("\"Usage\": %.2f%%\n", p->VolUsage);
+			printf("\"MountPoint\": \n");
 			for (WCHAR* q = p->VolNames; q[0] != L'\0'; q += wcslen(q) + 1)
 			{
 				printf("\t\t\t%s\n", Ucs2ToUtf8(q));
