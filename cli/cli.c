@@ -162,6 +162,7 @@ int main(int argc, char* argv[])
 		{
 			DISK_VOL_INFO* p = &pdInfo[i].VolInfo[j];
 			printf("\t%s\n", Ucs2ToUtf8(p->VolPath));
+			printf(Ucs2ToUtf8(p->VolPath));
 
 			printf("            \"StartLBA\": %llu\n", p->StartLba);
 			printf("            \"PartitionNumber\": %lu\n", p->PartNum);
@@ -173,12 +174,13 @@ int main(int argc, char* argv[])
 			printf("            \"FS\": \"%s\",\n", Ucs2ToUtf8(p->VolFs));
 			printf("            \"FreeSpace\": \"%s\",\n", GetHumanSize(p->VolFreeSpace.QuadPart, 1024));
 			printf("            \"TotalSpace\": \"%s\",\n", GetHumanSize(p->VolTotalSpace.QuadPart, 1024));
-			printf("            \"Usage\": %.2f%%\n", p->VolUsage);
-			printf("            \"MountPoint\": \n");
+			printf("            \"Usage\": \"%.2f%%\",\n", p->VolUsage);
+			printf("            \"MountPoint\": \"");
 			for (WCHAR* q = p->VolNames; q[0] != L'\0'; q += wcslen(q) + 1)
 			{
-				printf("\t\t\t%s\n", Ucs2ToUtf8(q));
+				printf("%s", Ucs2ToUtf8(q));
 			}
+			printf("\"\n");
 		}
 		printf("    }");
 		printf("%s", i < dwCount ? "    },\n" : "}\n");
