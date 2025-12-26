@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
 	(void)CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 	cdiSmart = cdi_create_smart();
 
-	printf("\"Version\":\"%s\",\n", cdi_get_version());
+	printf("Version:%s\n", cdi_get_version());
 
 	dwCount = GetDriveInfoList(FALSE, &pdInfo);
 	printf("Disk Count: %lu\n", dwCount);
