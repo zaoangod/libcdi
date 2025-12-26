@@ -107,33 +107,36 @@ int main(int argc, char* argv[])
 	printf("\"Version\": \"%s\",\n", cdi_get_version());
 
 	dwCount = GetDriveInfoList(FALSE, &pdInfo);
-	printf("DiskCount: %lu,\n", dwCount);
+	printf("\"DiskCount\": %lu,\n", dwCount);
 
 	cdi_init_smart(cdiSmart, CDI_FLAG_DEFAULT);
 
 	printf("\"PhysicalDrive\": [\n");
 	for (DWORD i = 0; i < dwCount; i++)
 	{
-		printf("    {");
+		printf("    {\n");
 		printf("        \"Index\": %lu,\n", pdInfo[i].Index);
-		printf("        \"HWID: %s\n", Ucs2ToUtf8(pdInfo[i].HwID));
-		printf("        \"Model: %s\n", Ucs2ToUtf8(pdInfo[i].HwName));
-		printf("        \"Size: %s\n", GetHumanSize(pdInfo[i].SizeInBytes, 1024));
-		printf("        \"Removable Media: %s\n", pdInfo[i].RemovableMedia ? "Yes" : "No");
-		printf("        \"Vendor Id: %s\n", pdInfo[i].VendorId);
-		printf("        \"Product Id: %s\n", pdInfo[i].ProductId);
-		printf("        \"Product Rev: %s\n", pdInfo[i].ProductRev);
-		printf("        \"Bus Type: %s\n", GetBusTypeName(pdInfo[i].BusType));
+		printf("        \"HWID\": \"%s\",\n", Ucs2ToUtf8(pdInfo[i].HwID));
+		printf("        \"Model\": \"%s\",\n", Ucs2ToUtf8(pdInfo[i].HwName));
+		printf("        \"Size\": \"%s\",\n", GetHumanSize(pdInfo[i].SizeInBytes, 1024));
+		printf("        \"RemovableMedia\": \"%s\",\n", pdInfo[i].RemovableMedia ? "Yes" : "No");
+		printf("        \"VendorId\": \"%s\",\n", pdInfo[i].VendorId);
+		printf("        \"ProductId\": \"%s\",\n", pdInfo[i].ProductId);
+		printf("        \"ProductRev\": \"%s\",\n", pdInfo[i].ProductRev);
+		printf("        \"BusType\": \"%s\",\n", GetBusTypeName(pdInfo[i].BusType));
 		printf("        \"PartitionTable\": \"%s\",\n", GetPartMapName(pdInfo[i].PartMap));
 		switch(pdInfo[i].PartMap)
 		{
 		case PARTITION_STYLE_MBR:
-			printf("\tMBR Signature: %02X %02X %02X %02X\n",
-				pdInfo[i].MbrSignature[0], pdInfo[i].MbrSignature[1],
-				pdInfo[i].MbrSignature[2], pdInfo[i].MbrSignature[3]);
+			printf("        \"MBR_Signature\": \"%02X %02X %02X %02X\",\n",
+				pdInfo[i].MbrSignature[0],
+				pdInfo[i].MbrSignature[1],
+				pdInfo[i].MbrSignature[2],
+				pdInfo[i].MbrSignature[3]
+			);
 			break;
 		case PARTITION_STYLE_GPT:
-			printf("\tGPT GUID: {%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X}\n",
+			printf("\"GPT_GUID\": \"{%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X}\",\n",
 				pdInfo[i].GptGuid[0], pdInfo[i].GptGuid[1], pdInfo[i].GptGuid[2], pdInfo[i].GptGuid[3],
 				pdInfo[i].GptGuid[4], pdInfo[i].GptGuid[5], pdInfo[i].GptGuid[6], pdInfo[i].GptGuid[7],
 				pdInfo[i].GptGuid[8], pdInfo[i].GptGuid[9], pdInfo[i].GptGuid[10], pdInfo[i].GptGuid[11],
