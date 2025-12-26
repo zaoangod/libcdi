@@ -103,26 +103,28 @@ int main(int argc, char* argv[])
 	(void)CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 	cdiSmart = cdi_create_smart();
 
-	printf("Version:%s\n", cdi_get_version());
+	printf("{\n");
+	printf("\"Version\": \"%s\",\n", cdi_get_version());
 
 	dwCount = GetDriveInfoList(FALSE, &pdInfo);
-	printf("Disk Count: %lu\n", dwCount);
+	printf("DiskCount: %lu,\n", dwCount);
 
 	cdi_init_smart(cdiSmart, CDI_FLAG_DEFAULT);
 
+	printf("\"PhysicalDrive\": [\n");
 	for (DWORD i = 0; i < dwCount; i++)
 	{
-		printf("\\\\.\\PhysicalDrive%lu\n", pdInfo[i].Index);
-		printf("\tHWID: %s\n", Ucs2ToUtf8(pdInfo[i].HwID));
-		printf("\tModel: %s\n", Ucs2ToUtf8(pdInfo[i].HwName));
-		printf("\tSize: %s\n", GetHumanSize(pdInfo[i].SizeInBytes, 1024));
-		printf("\tRemovable Media: %s\n", pdInfo[i].RemovableMedia ? "Yes" : "No");
-		printf("\tVendor Id: %s\n", pdInfo[i].VendorId);
-		printf("\tProduct Id: %s\n", pdInfo[i].ProductId);
-		printf("\tProduct Rev: %s\n", pdInfo[i].ProductRev);
-		printf("\tBus Type: %s\n", GetBusTypeName(pdInfo[i].BusType));
-
-		printf("\tPartition Table: %s\n", GetPartMapName(pdInfo[i].PartMap));
+		printf("    {");
+		printf("        \"Index\": %lu,\n", pdInfo[i].Index);
+		printf("        \"HWID: %s\n", Ucs2ToUtf8(pdInfo[i].HwID));
+		printf("        \"Model: %s\n", Ucs2ToUtf8(pdInfo[i].HwName));
+		printf("        \"Size: %s\n", GetHumanSize(pdInfo[i].SizeInBytes, 1024));
+		printf("        \"Removable Media: %s\n", pdInfo[i].RemovableMedia ? "Yes" : "No");
+		printf("        \"Vendor Id: %s\n", pdInfo[i].VendorId);
+		printf("        \"Product Id: %s\n", pdInfo[i].ProductId);
+		printf("        \"Product Rev: %s\n", pdInfo[i].ProductRev);
+		printf("        \"Bus Type: %s\n", GetBusTypeName(pdInfo[i].BusType));
+		printf("        \"PartitionTable\": \"%s\",\n", GetPartMapName(pdInfo[i].PartMap));
 		switch(pdInfo[i].PartMap)
 		{
 		case PARTITION_STYLE_MBR:
@@ -163,7 +165,10 @@ int main(int argc, char* argv[])
 				printf("\t\t\t%s\n", Ucs2ToUtf8(q));
 			}
 		}
+		printf("    }");
 	}
+	printf("]\n");
+	printf("}\n");
 
 	cdi_destroy_smart(cdiSmart);
 	DestoryDriveInfoList(pdInfo, dwCount);
