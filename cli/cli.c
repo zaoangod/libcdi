@@ -31,51 +31,51 @@ PrintSmartInfo(CDI_SMART* cdiSmart, PHY_DRIVE_INFO* pdInfo, INT nIndex)
 
 	if (nIndex < 0)
 	{
-		printf("\tSSD: %s\n", pdInfo->Ssd ? "Yes" : "No");
-		printf("\tSerial: %s\n", pdInfo->SerialNumber);
+		printf("\"SSD\": \"%s\",\n", pdInfo->Ssd ? "\"Yes\"" : "\"No\"");
+		printf("\"Serial\": \"%s\",\n", pdInfo->SerialNumber);
 		return;
 	}
 
 	cdi_update_smart(cdiSmart, nIndex);
 
 	ssd = cdi_get_bool(cdiSmart, nIndex, CDI_BOOL_SSD);
-	printf("\tSSD: %s\n", ssd ? "Yes" : "No");
+	printf("\"SSD\": \"%s\",\n", ssd ? "\"Yes\"" : "\"No\"");
 
 	str = cdi_get_string(cdiSmart, nIndex, CDI_STRING_SN);
-	printf("\tSerial: %s\n", Ucs2ToUtf8(str));
+	printf("\"Serial\": \"%s\",\n", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
 	str = cdi_get_string(cdiSmart, nIndex, CDI_STRING_FIRMWARE);
-	printf("\tFirmware: %s\n", Ucs2ToUtf8(str));
+	printf("\"Firmware\": \"%s\",\n", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
 	str = cdi_get_string(cdiSmart, nIndex, CDI_STRING_INTERFACE);
-	printf("\tInterface: %s\n", Ucs2ToUtf8(str));
+	printf("\"Interface\": \"%s\",\n", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
 	str = cdi_get_string(cdiSmart, nIndex, CDI_STRING_TRANSFER_MODE_CUR);
-	printf("\tCurrent Transfer Mode: %s\n", Ucs2ToUtf8(str));
+	printf("\"CurrentTransferMode\": \"%s\",\n", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
 	str = cdi_get_string(cdiSmart, nIndex, CDI_STRING_TRANSFER_MODE_MAX);
-	printf("\tMax Transfer Mode: %s\n", Ucs2ToUtf8(str));
+	printf("\"MaxTransferMode\": \"%s\",\n", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
 	str = cdi_get_string(cdiSmart, nIndex, CDI_STRING_FORM_FACTOR);
-	printf("\tForm Factor: %s\n", Ucs2ToUtf8(str));
+	printf("\"FormFactor\": \"%s\",\n", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
 	d = cdi_get_int(cdiSmart, nIndex, CDI_INT_LIFE);
-	printf("\tHealth Status: %s", cdi_get_health_status(cdi_get_int(cdiSmart, nIndex, CDI_INT_DISK_STATUS)));
+	printf("\"HealthStatus\": \"%s\",", cdi_get_health_status(cdi_get_int(cdiSmart, nIndex, CDI_INT_DISK_STATUS)));
 	if (d >= 0)
 		printf(" (%d%%)\n", d);
 	else
 		printf("\n");
 
-	printf("\tTemperature: %d (C)\n", cdi_get_int(cdiSmart, nIndex, CDI_INT_TEMPERATURE));
+	printf("\"Temperature:\" \"%d (C)\"\n", cdi_get_int(cdiSmart, nIndex, CDI_INT_TEMPERATURE));
 
 	str = cdi_get_smart_format(cdiSmart, nIndex);
-	printf("\tID  Status %-24s Name\n", Ucs2ToUtf8(str));
+	printf("\"IDStatus %-24s Name\"\n", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
 	n = cdi_get_dword(cdiSmart, nIndex, CDI_DWORD_ATTR_COUNT);
@@ -136,11 +136,24 @@ int main(int argc, char* argv[])
 			);
 			break;
 		case PARTITION_STYLE_GPT:
-			printf("\"GPT_GUID\": \"{%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X}\",\n",
-				pdInfo[i].GptGuid[0], pdInfo[i].GptGuid[1], pdInfo[i].GptGuid[2], pdInfo[i].GptGuid[3],
-				pdInfo[i].GptGuid[4], pdInfo[i].GptGuid[5], pdInfo[i].GptGuid[6], pdInfo[i].GptGuid[7],
-				pdInfo[i].GptGuid[8], pdInfo[i].GptGuid[9], pdInfo[i].GptGuid[10], pdInfo[i].GptGuid[11],
-				pdInfo[i].GptGuid[12], pdInfo[i].GptGuid[13], pdInfo[i].GptGuid[14], pdInfo[i].GptGuid[15]);
+			printf("        \"GPT_GUID\": \"{%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X}\",\n",
+				pdInfo[i].GptGuid[0],
+				pdInfo[i].GptGuid[1],
+				pdInfo[i].GptGuid[2],
+				pdInfo[i].GptGuid[3],
+				pdInfo[i].GptGuid[4],
+				pdInfo[i].GptGuid[5],
+				pdInfo[i].GptGuid[6],
+				pdInfo[i].GptGuid[7],
+				pdInfo[i].GptGuid[8],
+				pdInfo[i].GptGuid[9],
+				pdInfo[i].GptGuid[10],
+				pdInfo[i].GptGuid[11],
+				pdInfo[i].GptGuid[12],
+				pdInfo[i].GptGuid[13],
+				pdInfo[i].GptGuid[14],
+				pdInfo[i].GptGuid[15]
+			);
 			break;
 		}
 
