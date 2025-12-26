@@ -20,7 +20,7 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{20a977e8-8a04-4ac1-b050-d940e2e6ba13}</ProjectGuid>
-    <RootNamespace>cditest</RootNamespace>
+    <RootNamespace>cdi</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -149,7 +149,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="cditest.c" />
+    <ClCompile Include="cdi.c" />
     <ClCompile Include="disklib.c" />
   </ItemGroup>
   <ItemGroup>

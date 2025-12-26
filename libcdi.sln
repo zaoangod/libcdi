@@ -5,7 +5,7 @@ VisualStudioVersion = 17.6.33801.468
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libcdi", "libcdi\libcdi.vcxproj", "{F8C0B390-95BE-4B12-BA9B-48B4774FDDE4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cditest", "cditest\cditest.vcxproj", "{20A977E8-8A04-4AC1-B050-D940E2E6BA13}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cdi", "cdi\cdi.vcxproj", "{20A977E8-8A04-4AC1-B050-D940E2E6BA13}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

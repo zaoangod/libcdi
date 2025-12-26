@@ -33,7 +33,7 @@ jobs:
 
       - name: Stage artifacts for packaging
         run: |
-          $executables = "libcdi.dll", "cditest.exe"
+          $executables = "libcdi.dll", "cdi.exe"
           $platformMap = @{
               "x64/Release"   = "build/x64"
           }
