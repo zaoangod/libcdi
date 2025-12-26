@@ -31,51 +31,51 @@ PrintSmartInfo(CDI_SMART* cdiSmart, PHY_DRIVE_INFO* pdInfo, INT nIndex)
 
 	if (nIndex < 0)
 	{
-		printf("        \"SSD\": \"%s\",\n", pdInfo->Ssd ? "\"Yes\"" : "\"No\"");
-		printf("        \"Serial\": \"%s\",\n", pdInfo->SerialNumber);
+		printf("            \"SSD\": \"%s\",\n", pdInfo->Ssd ? "\"Yes\"" : "\"No\"");
+		printf("            \"Serial\": \"%s\",\n", pdInfo->SerialNumber);
 		return;
 	}
 
 	cdi_update_smart(cdiSmart, nIndex);
 
 	ssd = cdi_get_bool(cdiSmart, nIndex, CDI_BOOL_SSD);
-	printf("        \"SSD\": \"%s\",\n", ssd ? "\"Yes\"" : "\"No\"");
+	printf("            \"SSD\": \"%s\",\n", ssd ? "\"Yes\"" : "\"No\"");
 
 	str = cdi_get_string(cdiSmart, nIndex, CDI_STRING_SN);
-	printf("        \"Serial\": \"%s\",\n", Ucs2ToUtf8(str));
+	printf("            \"Serial\": \"%s\",\n", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
 	str = cdi_get_string(cdiSmart, nIndex, CDI_STRING_FIRMWARE);
-	printf("        \"Firmware\": \"%s\",\n", Ucs2ToUtf8(str));
+	printf("            \"Firmware\": \"%s\",\n", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
 	str = cdi_get_string(cdiSmart, nIndex, CDI_STRING_INTERFACE);
-	printf("        \"Interface\": \"%s\",\n", Ucs2ToUtf8(str));
+	printf("            \"Interface\": \"%s\",\n", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
 	str = cdi_get_string(cdiSmart, nIndex, CDI_STRING_TRANSFER_MODE_CUR);
-	printf("        \"CurrentTransferMode\": \"%s\",\n", Ucs2ToUtf8(str));
+	printf("            \"CurrentTransferMode\": \"%s\",\n", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
 	str = cdi_get_string(cdiSmart, nIndex, CDI_STRING_TRANSFER_MODE_MAX);
-	printf("        \"MaxTransferMode\": \"%s\",\n", Ucs2ToUtf8(str));
+	printf("            \"MaxTransferMode\": \"%s\",\n", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
 	str = cdi_get_string(cdiSmart, nIndex, CDI_STRING_FORM_FACTOR);
-	printf("        \"FormFactor\": \"%s\",\n", Ucs2ToUtf8(str));
+	printf("            \"FormFactor\": \"%s\",\n", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
 	d = cdi_get_int(cdiSmart, nIndex, CDI_INT_LIFE);
-	printf("        \"HealthStatus\": \"%s\",", cdi_get_health_status(cdi_get_int(cdiSmart, nIndex, CDI_INT_DISK_STATUS)));
+	printf("            \"HealthStatus\": \"%s\",", cdi_get_health_status(cdi_get_int(cdiSmart, nIndex, CDI_INT_DISK_STATUS)));
 	if (d >= 0)
 		printf(" (%d%%)\n", d);
 	else
 		printf("\n");
 
-	printf("        \"Temperature:\" \"%d(C)\"\n", cdi_get_int(cdiSmart, nIndex, CDI_INT_TEMPERATURE));
+	printf("            \"Temperature:\" \"%d(C)\"\n", cdi_get_int(cdiSmart, nIndex, CDI_INT_TEMPERATURE));
 
 	str = cdi_get_smart_format(cdiSmart, nIndex);
-	printf("        \"IDStatus %-24s Name\"\n", Ucs2ToUtf8(str));
+	printf("            \"IDStatus %-24s Name\"\n", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
 	n = cdi_get_dword(cdiSmart, nIndex, CDI_DWORD_ATTR_COUNT);
@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
 
 	cdi_init_smart(cdiSmart, CDI_FLAG_DEFAULT);
 
-	printf("        \"PhysicalDrive\": [\n");
+	printf("    \"PhysicalDrive\": [\n");
 	for (DWORD i = 0; i < dwCount; i++)
 	{
 		printf("        {\n");
@@ -163,19 +163,18 @@ int main(int argc, char* argv[])
 			DISK_VOL_INFO* p = &pdInfo[i].VolInfo[j];
 			printf("\t%s\n", Ucs2ToUtf8(p->VolPath));
 
-			printf("\"StartLBA\": %llu\n", p->StartLba);
-			printf("\"PartitionNumber\": %lu\n", p->PartNum);
-			printf("\"PartitionType\": \"%s\",\n", Ucs2ToUtf8(p->PartType));
-			printf("\"PartitionID\": \"%s\",\n", Ucs2ToUtf8(p->PartId));
-			printf("\"BootIndicator\": \"%s\",\n", p->BootIndicator ? "Yes" : "No");
-			printf("\"PartitionFlag\": \"%s\",\n", Ucs2ToUtf8(p->PartFlag));
-
-			printf("\"Label\": \"%s\",\n", Ucs2ToUtf8(p->VolLabel));
-			printf("\"FS\": \"%s\",\n", Ucs2ToUtf8(p->VolFs));
-			printf("\"FreeSpace\": \"%s\",\n", GetHumanSize(p->VolFreeSpace.QuadPart, 1024));
-			printf("\"TotalSpace\": \"%s\",\n", GetHumanSize(p->VolTotalSpace.QuadPart, 1024));
-			printf("\"Usage\": %.2f%%\n", p->VolUsage);
-			printf("\"MountPoint\": \n");
+			printf("            \"StartLBA\": %llu\n", p->StartLba);
+			printf("            \"PartitionNumber\": %lu\n", p->PartNum);
+			printf("            \"PartitionType\": \"%s\",\n", Ucs2ToUtf8(p->PartType));
+			printf("            \"PartitionID\": \"%s\",\n", Ucs2ToUtf8(p->PartId));
+			printf("            \"BootIndicator\": \"%s\",\n", p->BootIndicator ? "Yes" : "No");
+			printf("            \"PartitionFlag\": \"%s\",\n", Ucs2ToUtf8(p->PartFlag));
+			printf("            \"Label\": \"%s\",\n", Ucs2ToUtf8(p->VolLabel));
+			printf("            \"FS\": \"%s\",\n", Ucs2ToUtf8(p->VolFs));
+			printf("            \"FreeSpace\": \"%s\",\n", GetHumanSize(p->VolFreeSpace.QuadPart, 1024));
+			printf("            \"TotalSpace\": \"%s\",\n", GetHumanSize(p->VolTotalSpace.QuadPart, 1024));
+			printf("            \"Usage\": %.2f%%\n", p->VolUsage);
+			printf("            \"MountPoint\": \n");
 			for (WCHAR* q = p->VolNames; q[0] != L'\0'; q += wcslen(q) + 1)
 			{
 				printf("\t\t\t%s\n", Ucs2ToUtf8(q));
