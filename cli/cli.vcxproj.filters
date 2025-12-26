@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="cdi.c">
+    <ClCompile Include="cli.c">
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="disklib.c">
