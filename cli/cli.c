@@ -160,11 +160,11 @@ int main(int argc, char* argv[])
 		PrintSmartInfo(cdiSmart, &pdInfo[i], GetSmartIndex(cdiSmart, pdInfo[i].Index));
 		for (DWORD j = 0; j < pdInfo[i].VolCount; j++)
 		{
-			printf("\"Volume\": {");
+			printf("            \"Volume\": {");
 
 			DISK_VOL_INFO* p = &pdInfo[i].VolInfo[j];
-			printf("\t%s\n", Ucs2ToUtf8(p->VolPath));
-			printf("                \"Volume\": %s,\n", Ucs2ToUtf8(p->VolPath));
+			// printf("\t%s\n", Ucs2ToUtf8(p->VolPath));
+			printf("                \"Volume\": \"%s\",\n", Ucs2ToUtf8(p->VolPath));
 			printf("                \"StartLBA\": %llu,\n", p->StartLba);
 			printf("                \"PartitionNumber\": %lu\n", p->PartNum);
 			printf("                \"PartitionType\": \"%s\",\n", Ucs2ToUtf8(p->PartType));
@@ -183,7 +183,7 @@ int main(int argc, char* argv[])
 			}
 			printf("\"\n");
 
-			printf("}\n");
+			printf("            }%s\n", j < pdInfo[i].VolCount ? "," : "");
 		}
 		printf("    }");
 		printf("%s", i < dwCount ? "    },\n" : "}\n");
