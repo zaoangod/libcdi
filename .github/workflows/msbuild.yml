@@ -9,96 +9,91 @@ on:
 env:
   # Path to the solution file relative to the root of the project.
   SOLUTION_FILE_PATH: .
-  ARTIFACT_NAME: libcdi
+  ARTIFACT_NAME: cdi
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
 
-    - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v2
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
 
-    - name: Restore NuGet packages
-      working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: nuget restore ${{env.SOLUTION_FILE_PATH}}
+      - name: Restore NuGet packages
+        working-directory: ${{env.GITHUB_WORKSPACE}}
+        run: nuget restore ${{env.SOLUTION_FILE_PATH}}
 
-    - name: Build
-      working-directory: ${{env.GITHUB_WORKSPACE}}
-      # Add additional options to the MSBuild command line here (like platform or verbosity level).
-      # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
-      run: |
-        msbuild /m /p:Configuration=Release /p:platform=x64 ${{env.SOLUTION_FILE_PATH}}
-        msbuild /m /p:Configuration=Release /p:platform=x86 ${{env.SOLUTION_FILE_PATH}}
-        msbuild /m /p:Configuration=Release /p:platform=arm64 ${{env.SOLUTION_FILE_PATH}}
+      - name: Build
+        working-directory: ${{env.GITHUB_WORKSPACE}}
+        # Add additional options to the MSBuild command line here (like platform or verbosity level).
+        # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
+        run: msbuild /m /p:Configuration=Release /p:platform=x64 ${{env.SOLUTION_FILE_PATH}}
 
-    - name: Stage artifacts for packaging
-      run: |
-        $executables = "libcdi.dll", "cditest.exe"
-        $platformMap = @{
-            "x64/Release"   = "build/x64"
-            "Win32/Release" = "build/x86"
-            "ARM64/Release" = "build/arm64"
-        }
-        $platformMap.Values | ForEach-Object { New-Item -Path $_ -ItemType Directory -Force }
-        foreach ($entry in $platformMap.GetEnumerator()) {
-            foreach ($exe in $executables) {
-                Move-Item -Path "$($entry.Name)/$exe" -Destination "$($entry.Value)/"
-            }
-        }
-        Copy-Item -Path "libcdi/libcdi.h" -Destination "build/libcdi.h"
-        Copy-Item -Path "LICENSE.txt" -Destination "build/LICENSE.txt"
-        Copy-Item -Path "README.md" -Destination "build/README.md"
+      - name: Stage artifacts for packaging
+        run: |
+          $executables = "libcdi.dll", "cditest.exe"
+          $platformMap = @{
+              "x64/Release"   = "build/x64"
+          }
+          $platformMap.Values | ForEach-Object { New-Item -Path $_ -ItemType Directory -Force }
+          foreach ($entry in $platformMap.GetEnumerator()) {
+              foreach ($exe in $executables) {
+                  Move-Item -Path "$($entry.Name)/$exe" -Destination "$($entry.Value)/"
+              }
+          }
+          Copy-Item -Path "libcdi/libcdi.h" -Destination "build/libcdi.h"
+          Copy-Item -Path "LICENSE.txt" -Destination "build/LICENSE.txt"
+          Copy-Item -Path "README.md" -Destination "build/README.md"
 
-    - name: Create ZIP Archive
-      run: Compress-Archive -Path build/* -DestinationPath "${{ env.ARTIFACT_NAME }}.zip"
+      - name: Create ZIP Archive
+        run: Compress-Archive -Path build/* -DestinationPath "${{ env.ARTIFACT_NAME }}.zip"
 
-    - name: Generate Release Notes
-      env:
-        COMMITS_JSON: ${{ toJSON(github.event.commits) }}
-      run: |
-        $changelogLines = New-Object System.Collections.Generic.List[string]
-        if ("${{ github.event_name }}" -eq "push") {
-          Write-Host "Generating changelog from push event payload"
-          $commits = $env:COMMITS_JSON | ConvertFrom-Json
-          if ($null -ne $commits) {
-            foreach ($commit in $commits) {
-              $shortSha = $commit.id.Substring(0, 7)
-              # Take only the first line of the commit message
-              $commitMessage = ($commit.message -split "`r?`n")[0]
-              $changelogLines.Add("* $commitMessage ($shortSha) by @$($commit.author.name)")
+      - name: Generate Release Notes
+        env:
+          COMMITS_JSON: ${{ toJSON(github.event.commits) }}
+        run: |
+          $changelogLines = New-Object System.Collections.Generic.List[string]
+          if ("${{ github.event_name }}" -eq "push") {
+            Write-Host "Generating changelog from push event payload"
+            $commits = $env:COMMITS_JSON | ConvertFrom-Json
+            if ($null -ne $commits) {
+              foreach ($commit in $commits) {
+                $shortSha = $commit.id.Substring(0, 7)
+                # Take only the first line of the commit message
+                $commitMessage = ($commit.message -split "`r?`n")[0]
+                $changelogLines.Add("* $commitMessage ($shortSha) by @$($commit.author.name)")
+              }
             }
           }
-        }
-        else {
-          Write-Host "Generating changelog for workflow_dispatch event (latest commit)"
-          $latest_commit = git log --pretty=format:'* %s (%h) by @%an' -n 1
-          $changelogLines.Add($latest_commit)
-        }
+          else {
+            Write-Host "Generating changelog for workflow_dispatch event (latest commit)"
+            $latest_commit = git log --pretty=format:'* %s (%h) by @%an' -n 1
+            $changelogLines.Add($latest_commit)
+          }
+          
+          $changelogBody = $changelogLines -join "`n"
+          if ([string]::IsNullOrWhiteSpace($changelogBody)) {
+            $changelogBody = "No new commits in this push. Automated build from commit ${{ github.sha }}."
+          }
+          
+          $changelogBody | Out-File -FilePath "release_notes.txt" -Encoding utf8
 
-        $changelogBody = $changelogLines -join "`n"
-        if ([string]::IsNullOrWhiteSpace($changelogBody)) {
-          $changelogBody = "No new commits in this push. Automated build from commit ${{ github.sha }}."
-        }
+      - name: Delete old release
+        continue-on-error: true
+        working-directory: ${{env.GITHUB_WORKSPACE}}
+        run: |
+          gh release delete latest --cleanup-tag --yes
+        env:
+          GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
-        $changelogBody | Out-File -FilePath "release_notes.txt" -Encoding utf8
-
-    - name: Delete old release
-      continue-on-error: true
-      working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: |
-        gh release delete latest --cleanup-tag --yes
-      env:
-        GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-
-    - name: Create new release
-      run: |
-        $date_version = (Get-Date -Format 'yyyyMMdd') + ".${{ github.run_number }}"
-        gh release create latest "${{ env.ARTIFACT_NAME }}.zip" `
-          --latest `
-          --title "Build $date_version" `
-          --notes-file "release_notes.txt"
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create new release
+        run: |
+          $date_version = (Get-Date -Format 'yyyyMMdd') + ".${{ github.run_number }}"
+          gh release create latest "${{ env.ARTIFACT_NAME }}.zip" `
+            --latest `
+            --title "Build $date_version" `
+            --notes-file "release_notes.txt"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
