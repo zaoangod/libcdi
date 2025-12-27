@@ -203,16 +203,17 @@ PrintSmartInfo(cJSON *physicalDriveItem, CDI_SMART* cdiSmart, PHY_DRIVE_INFO* pd
 	cJSON_AddStringToObject(physicalDriveItem, "FormFactor", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
+	// HealthStatus
+	XString healthStatus = xs_new("");
 	d = cdi_get_int(cdiSmart, nIndex, CDI_INT_LIFE);
 	if (d >= 0)
-		XString healthStatus = xs_new("");
 		xs_append_format(&healthStatus, "%s (%d%%)", cdi_get_health_status(cdi_get_int(cdiSmart, nIndex, CDI_INT_DISK_STATUS)), d);
-		cJSON_AddStringToObject(physicalDriveItem, "HealthStatus", healthStatus.data);
-		xs_free(&healthStatus);
 	else
-		cJSON_AddStringToObject(physicalDriveItem, "HealthStatus", cdi_get_health_status(cdi_get_int(cdiSmart, nIndex, CDI_INT_DISK_STATUS)));
+		xs_append_format(&healthStatus, "%s", cdi_get_health_status(cdi_get_int(cdiSmart, nIndex, CDI_INT_DISK_STATUS)));
+	cJSON_AddStringToObject(physicalDriveItem, "HealthStatus", healthStatus.data);
+	xs_free(&healthStatus);
 
-
+	// Temperature
 	XString temperature = xs_new("");
 	xs_append_format(&temperature, "%d (C)", cdi_get_int(cdiSmart, nIndex, CDI_INT_TEMPERATURE));
 	cJSON_AddStringToObject(physicalDriveItem, "Temperature", temperature.data);
