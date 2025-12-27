@@ -236,9 +236,11 @@ int main(int argc, char* argv[])
 		cJSON_Delete(diskInfo);
 		return 1;
 	}
+	printf("-----------------");
 	printf("%s", diskInfoJson);
 	free(diskInfoJson);
 	cJSON_Delete(diskInfo);
+	printf("-----------------");
 
 	return 0;
 }
