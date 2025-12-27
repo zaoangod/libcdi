@@ -71,7 +71,7 @@ PrintSmartInfo(CDI_SMART* cdiSmart, PHY_DRIVE_INFO* pdInfo, INT nIndex)
 	else
 		printf("            \"HealthStatus\": \"%s\",\n", cdi_get_health_status(cdi_get_int(cdiSmart, nIndex, CDI_INT_DISK_STATUS)));
 
-	printf("            \"Temperature:\" \"%d (C)\"\n", cdi_get_int(cdiSmart, nIndex, CDI_INT_TEMPERATURE));
+	printf("            \"Temperature:\" \"%d (C)\",\n", cdi_get_int(cdiSmart, nIndex, CDI_INT_TEMPERATURE));
 
 	str = cdi_get_smart_format(cdiSmart, nIndex);
 	Ucs2ToUtf8(str);
@@ -184,7 +184,7 @@ int main(int argc, char* argv[])
 				printf("%s", Ucs2ToUtf8(q));
 			}
 			printf("\"\n");
-			printf("            }%s\n", j < pdInfo[i].VolCount ? "," : "");
+			printf("                }%s\n", (j + 1) < pdInfo[i].VolCount ? "," : "");
 		}
 
 		printf("            ]\n");
