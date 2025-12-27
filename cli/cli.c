@@ -140,17 +140,6 @@ int main(int argc, char* argv[])
 		cJSON_AddStringToObject(physicalDriveItem, "BusType", GetBusTypeName(pdInfo[i].BusType));
 		cJSON_AddStringToObject(physicalDriveItem, "PartitionTable", GetPartMapName(pdInfo[i].PartMap));
 
-		printf("        {\n");
-		printf("            \"Index\": %lu,\n", pdInfo[i].Index);
-		printf("            \"HWID\"", Ucs2ToUtf8(pdInfo[i].HwID));
-		printf("            \"Model\"", Ucs2ToUtf8(pdInfo[i].HwName));
-		printf("            \"Size\"", GetHumanSize(pdInfo[i].SizeInBytes, 1024));
-		printf("            \"RemovableMedia\"", pdInfo[i].RemovableMedia ? "Yes" : "No");
-		printf("            \"VendorId\"", pdInfo[i].VendorId);
-		printf("            \"ProductId\"", pdInfo[i].ProductId);
-		printf("            \"ProductRev\"", pdInfo[i].ProductRev);
-		printf("            \"BusType\"", GetBusTypeName(pdInfo[i].BusType));
-		printf("            \"PartitionTable\"", GetPartMapName(pdInfo[i].PartMap));
 		switch(pdInfo[i].PartMap)
 		{
 		case PARTITION_STYLE_MBR:
@@ -198,18 +187,18 @@ int main(int argc, char* argv[])
 
 			cJSON *volumeItem = cJSON_CreateObject();
 			cJSON_AddItemToArray(volumeList, volumeItem);
-			cJSON_AddStringToObject(volumeItem, "Volume", Ucs2ToUtf8(p->VolPath));
-			cJSON_AddNumberToObject(volumeItem, "StartLBA", p->StartLba);
-			cJSON_AddNumberToObject(volumeItem, "PartitionNumber", p->PartNum);
-			cJSON_AddStringToObject(volumeItem, "PartitionType", Ucs2ToUtf8(p->PartType));
-			cJSON_AddStringToObject(volumeItem, "PartitionID", Ucs2ToUtf8(p->PartId));
-			cJSON_AddStringToObject(volumeItem, "BootIndicator", p->BootIndicator ? "Yes" : "No");
-			cJSON_AddStringToObject(volumeItem, "PartitionFlag", Ucs2ToUtf8(p->PartFlag));
-			cJSON_AddStringToObject(volumeItem, "Label", Ucs2ToUtf8(p->VolLabel));
-			cJSON_AddStringToObject(volumeItem, "FS", Ucs2ToUtf8(p->VolFs));
-			cJSON_AddStringToObject(volumeItem, "FreeSpace", GetHumanSize(p->VolFreeSpace.QuadPart, 1024));
-			cJSON_AddStringToObject(volumeItem, "TotalSpace", GetHumanSize(p->VolTotalSpace.QuadPart, 1024));
-			cJSON_AddNumberToObject(volumeItem, "Usage", p->VolUsage);
+			// cJSON_AddStringToObject(volumeItem, "Volume", Ucs2ToUtf8(p->VolPath));
+			// cJSON_AddNumberToObject(volumeItem, "StartLBA", p->StartLba);
+			// cJSON_AddNumberToObject(volumeItem, "PartitionNumber", p->PartNum);
+			// cJSON_AddStringToObject(volumeItem, "PartitionType", Ucs2ToUtf8(p->PartType));
+			// cJSON_AddStringToObject(volumeItem, "PartitionID", Ucs2ToUtf8(p->PartId));
+			// cJSON_AddStringToObject(volumeItem, "BootIndicator", p->BootIndicator ? "Yes" : "No");
+			// cJSON_AddStringToObject(volumeItem, "PartitionFlag", Ucs2ToUtf8(p->PartFlag));
+			// cJSON_AddStringToObject(volumeItem, "Label", Ucs2ToUtf8(p->VolLabel));
+			// cJSON_AddStringToObject(volumeItem, "FS", Ucs2ToUtf8(p->VolFs));
+			// cJSON_AddStringToObject(volumeItem, "FreeSpace", GetHumanSize(p->VolFreeSpace.QuadPart, 1024));
+			// cJSON_AddStringToObject(volumeItem, "TotalSpace", GetHumanSize(p->VolTotalSpace.QuadPart, 1024));
+			// cJSON_AddNumberToObject(volumeItem, "Usage", p->VolUsage);
 
 			UString *mountPointValue;
 			u_string_new(mountPointValue);
