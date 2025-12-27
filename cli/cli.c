@@ -3,6 +3,8 @@
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
+#include <string.h>
 
 #include "../cdi/cdi.h"
 #include "disklib.h"
@@ -10,6 +12,135 @@
 
 #pragma comment(lib, "cdi.lib")
 #pragma comment(lib, "setupapi.lib")
+
+
+// ----------------------------------------------------------------------------------
+// ----------------------------------X-String start----------------------------------
+// ----------------------------------------------------------------------------------
+
+// 默认初始容量
+#define XS_DEFAULT_CAPACITY 256
+
+// 动态字符串结构体（对外暴露，方便用户操作）
+typedef struct XString {
+    char *data; // 字符串数据
+    size_t length; // 有效字符长度（不含'\0'）
+    size_t capacity; // 总容量（含'\0'）
+} XString;
+
+/**
+ * @brief 创建新的动态字符串
+ * @param value 初始字符串（NULL 则创建空字符串）
+ * @return 初始化后的 XString 实例
+ */
+XString xs_new(const char *value) {
+    // 初始化为空
+    XString sb = {NULL, 0, 0};
+    if (value == NULL) {
+        sb.length = 0;
+        sb.capacity = XS_DEFAULT_CAPACITY;
+        sb.data = malloc(sb.capacity * sizeof(char));
+        if (!sb.data) {
+            sb.length = 0;
+            sb.capacity = 0;
+            return sb;
+        }
+        sb.data[0] = '\0';
+        return sb;
+    }
+
+    sb.length = strlen(value);
+    sb.capacity = (sb.length + 1 > XS_DEFAULT_CAPACITY) ? sb.length + 1 : XS_DEFAULT_CAPACITY;
+    sb.data = malloc(sb.capacity * sizeof(char));
+    if (!sb.data) {
+        sb.length = 0;
+        sb.capacity = 0;
+        return sb;
+    }
+
+    strcpy(sb.data, value);
+    return sb;
+}
+
+/**
+ * @brief 确保动态字符串有足够的容量
+ * @param x_string 动态字符串指针
+ * @param new_capacity 所需最小容量
+ * @return 0 成功，-1 失败（参数错误/内存分配失败）
+ */
+int xs_ensure_capacity(XString *x_string, const size_t new_capacity) {
+    if (!x_string || !x_string->data) {
+        return -1;
+    }
+    if (new_capacity > x_string->capacity) {
+        const size_t new_cap = new_capacity + (new_capacity / 2);
+        char *new_data = realloc(x_string->data, new_cap);
+        if (!new_data) {
+            return -1;
+        }
+        x_string->data = new_data;
+        x_string->capacity = new_cap;
+    }
+    return 0;
+}
+
+/**
+ * @brief 追加格式化字符串到动态字符串
+ * @param x_string 动态字符串指针
+ * @param format 格式化字符串
+ * @param ... 可变参数
+ * @return 0 成功，-1 失败
+ */
+int xs_append_format(XString *x_string, const char *format, ...) {
+    if (!x_string || !format) {
+        return -1;
+    }
+
+    va_list args;
+    va_start(args, format);
+
+    int needed_size = vsnprintf(NULL, 0, format, args);
+    va_end(args);
+
+    if (needed_size < 0) {
+        return -1;
+    }
+
+    size_t new_len = x_string->length + needed_size + 1;
+    if (new_len > x_string->capacity) {
+        if (xs_ensure_capacity(x_string, new_len) != 0) {
+            return -1;
+        }
+    }
+
+    va_start(args, format);
+    int result = vsnprintf(x_string->data + x_string->length, needed_size + 1, format, args);
+    va_end(args);
+
+    if (result < 0) {
+        return -1;
+    }
+
+    x_string->length += needed_size;
+
+    return 0;
+}
+
+/**
+ * @brief 释放动态字符串内存
+ * @param x_string 动态字符串指针
+ */
+void xs_free(XString *x_string) {
+    if (x_string && x_string->data) {
+        free(x_string->data);
+        x_string->data = NULL;
+        x_string->length = 0;
+        x_string->capacity = XS_DEFAULT_CAPACITY;
+    }
+}
+// --------------------------------------------------------------------------------
+// ----------------------------------X-String end----------------------------------
+// --------------------------------------------------------------------------------
 
 static INT
 GetSmartIndex(CDI_SMART* cdiSmart, DWORD dwId)
@@ -106,22 +237,17 @@ int main(int argc, char* argv[])
 	(void)CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 	cdiSmart = cdi_create_smart();
 
-	// 创建一个json对象
-	cJSON *diskInfo = cJSON_CreateObject();
-	if (diskInfo == NULL) {
-		fputs("create info object exception\n", stderr);
-		return 1;
-	}
-    cJSON_AddStringToObject(diskInfo, "Version", cdi_get_version());
-
 	dwCount = GetDriveInfoList(FALSE, &pdInfo);
+
+	cJSON *diskInfo = cJSON_CreateObject();
 	cJSON_AddNumberToObject(diskInfo, "DiskCount", dwCount);
+	cJSON_AddStringToObject(diskInfo, "Version", cdi_get_version());
 
 	cdi_init_smart(cdiSmart, CDI_FLAG_DEFAULT);
 
 	// 创建物理硬盘列表
 	cJSON *physicalDriveList = cJSON_CreateArray();
-    cJSON_AddItemToObject(diskInfo, "PhysicalDriveList", physicalDriveList);
+	cJSON_AddItemToObject(diskInfo, "PhysicalDriveList", physicalDriveList);
 
 	for (DWORD i = 0; i < dwCount; i++)
 	{
@@ -137,31 +263,13 @@ int main(int argc, char* argv[])
 		cJSON_AddStringToObject(physicalDriveItem, "BusType", GetBusTypeName(pdInfo[i].BusType));
 		cJSON_AddStringToObject(physicalDriveItem, "PartitionTable", GetPartMapName(pdInfo[i].PartMap));
 
-		printf("        {\n");
-		printf("            \"Index\": %lu,\n", pdInfo[i].Index);
-		printf("            \"HWID\": \"%s\",\n", Ucs2ToUtf8(pdInfo[i].HwID));
-		printf("            \"Model\": \"%s\",\n", Ucs2ToUtf8(pdInfo[i].HwName));
-		printf("            \"Size\": \"%s\",\n", GetHumanSize(pdInfo[i].SizeInBytes, 1024));
-		printf("            \"RemovableMedia\": \"%s\",\n", pdInfo[i].RemovableMedia ? "Yes" : "No");
-		printf("            \"VendorId\": \"%s\",\n", pdInfo[i].VendorId);
-		printf("            \"ProductId\": \"%s\",\n", pdInfo[i].ProductId);
-		printf("            \"ProductRev\": \"%s\",\n", pdInfo[i].ProductRev);
-		printf("            \"BusType\": \"%s\",\n", GetBusTypeName(pdInfo[i].BusType));
-		printf("            \"PartitionTable\": \"%s\",\n", GetPartMapName(pdInfo[i].PartMap));
 		switch(pdInfo[i].PartMap)
 		{
 		case PARTITION_STYLE_MBR:
-			char mbr_signature[32] = {0};
-			sprintf_s(
-				mbr_signature,
-				sizeof(mbr_signature),
-				"%02X %02X %02X %02X",
-				pdInfo[i].MbrSignature[0],
-				pdInfo[i].MbrSignature[1],
-				pdInfo[i].MbrSignature[2],
-				pdInfo[i].MbrSignature[3]
-			);
-			cJSON_AddStringToObject(physicalDriveItem, "MbrSignature", mbr_signature);
+			XString xs = xs_new("");
+			xs_append_format(&xs, "%02X %02X %02X %02X", pdInfo[i].MbrSignature[0], pdInfo[i].MbrSignature[1], pdInfo[i].MbrSignature[2], pdInfo[i].MbrSignature[3]);
+			cJSON_AddStringToObject(physicalDriveItem, "MbrSignature", xs.data);
+			xs_free(&xs);
 			break;
 		case PARTITION_STYLE_GPT:
 			char gpt_guid[64] = {0};
