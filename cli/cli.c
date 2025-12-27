@@ -161,10 +161,10 @@ static VOID
 PrintSmartInfo(cJSON *physicalDriveItem, CDI_SMART* cdiSmart, PHY_DRIVE_INFO* pdInfo, INT nIndex)
 {
 	INT d;
-	//DWORD n;
+	DWORD n;
 	WCHAR* str;
 	BOOL ssd;
-	//BYTE id;
+	BYTE id;
 
 	if (nIndex < 0)
 	{
@@ -218,25 +218,29 @@ PrintSmartInfo(cJSON *physicalDriveItem, CDI_SMART* cdiSmart, PHY_DRIVE_INFO* pd
 	cJSON_AddStringToObject(physicalDriveItem, "Temperature", temperature.data);
 	xs_free(&temperature);
 
+	// StatusValue
 	str = cdi_get_smart_format(cdiSmart, nIndex);
 	Ucs2ToUtf8(str);
-	cJSON_AddStringToObject(physicalDriveItem, "StatusRawValue", Ucs2ToUtf8(str));
+	cJSON_AddStringToObject(physicalDriveItem, "StatusValue", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
-	//n = cdi_get_dword(cdiSmart, nIndex, CDI_DWORD_ATTR_COUNT);
-	//for (INT j = 0; j < (INT)n; j++)
-	//{
-	//	id = cdi_get_smart_id(cdiSmart, nIndex, j);
-	//	if (id == 0x00)
-	//		continue;
-	//	str = cdi_get_smart_value(cdiSmart, nIndex, j, FALSE);
-	//	printf("\t%02X %7s %-24s",
-	//		id,
-	//		cdi_get_health_status(cdi_get_smart_status(cdiSmart, nIndex, j)),
-	//		Ucs2ToUtf8(str));
-	//	printf(" %s\n", Ucs2ToUtf8(cdi_get_smart_name(cdiSmart, nIndex, id)));
-	//	cdi_free_string(str);
-	//}
+	// StatusRawValue
+	XString statusRawValue = xs_new("");
+	n = cdi_get_dword(cdiSmart, nIndex, CDI_DWORD_ATTR_COUNT);
+	for (INT j = 0; j < (INT)n; j++)
+	{
+		id = cdi_get_smart_id(cdiSmart, nIndex, j);
+		if (id == 0x00)
+			continue;
+		str = cdi_get_smart_value(cdiSmart, nIndex, j, FALSE);
+		xs_append_format(&statusRawValue, "%02X %7s %-24s",
+			id,
+			cdi_get_health_status(cdi_get_smart_status(cdiSmart, nIndex, j)),
+			Ucs2ToUtf8(str)
+		);
+		xs_append_format(&temperature, " %s\n", Ucs2ToUtf8(cdi_get_smart_name(cdiSmart, nIndex, id)));
+		cdi_free_string(str);
+	}
 }
 
 int main(int argc, char* argv[])
