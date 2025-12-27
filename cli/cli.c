@@ -66,16 +66,15 @@ PrintSmartInfo(CDI_SMART* cdiSmart, PHY_DRIVE_INFO* pdInfo, INT nIndex)
 	cdi_free_string(str);
 
 	d = cdi_get_int(cdiSmart, nIndex, CDI_INT_LIFE);
-	printf("            \"HealthStatus\": \"%s\",", cdi_get_health_status(cdi_get_int(cdiSmart, nIndex, CDI_INT_DISK_STATUS)));
 	if (d >= 0)
-		printf(" (%d%%)\n", d);
+		printf("            \"HealthStatus\": \"%s (%d%%)\n\",", cdi_get_health_status(cdi_get_int(cdiSmart, nIndex, CDI_INT_DISK_STATUS)), d);
 	else
-		printf("\n");
+		printf("            \"HealthStatus\": \"%s\n\",", cdi_get_health_status(cdi_get_int(cdiSmart, nIndex, CDI_INT_DISK_STATUS)));
 
 	printf("            \"Temperature:\" \"%d(C)\"\n", cdi_get_int(cdiSmart, nIndex, CDI_INT_TEMPERATURE));
 
 	str = cdi_get_smart_format(cdiSmart, nIndex);
-	printf("            \"IDStatus %-24s Name\"\n", Ucs2ToUtf8(str));
+	printf("            \"Status%s\": \n", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
 	n = cdi_get_dword(cdiSmart, nIndex, CDI_DWORD_ATTR_COUNT);

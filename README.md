@@ -137,7 +137,7 @@ Gets the S.M.A.R.T. data format string.
     - `ptr`: A pointer to the `CDI_SMART` structure.
     - `index`: The disk index.
 - **Return Value:** A string representing the S.M.A.R.T. data format. Use `cdi_free_string` to release the memory.
-    - Possible values are `RawValues(7)`, `RawValues(8)`, `Cur RawValues(8)`, `Cur Wor --- RawValues(6)`, `Cur Wor Thr RawValues(6)`, `Cur Wor --- RawValues(7)` and `Cur Wor Thr RawValues(7)`.
+    - Possible values are `RawValue(7)`, `RawValue(8)`, `Cur RawValue(8)`, `Cur Wor --- RawValue(6)`, `Cur Wor Thr RawValue(6)`, `Cur Wor --- RawValue(7)` and `Cur Wor Thr RawValue(7)`.
 
 ---
 ### `BYTE WINAPI cdi_get_smart_id(CDI_SMART* ptr, INT index, INT attr)`

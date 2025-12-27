@@ -286,25 +286,25 @@ cdi_get_smart_format(CDI_SMART * ptr, INT index)
 	if (ptr->vars[index].DiskVendorId == CAtaSmart::SSD_VENDOR_SANDFORCE)
 	{
 		if (ptr->vars[index].IsThresholdCorrect)
-			fmt = _T("Cur Wor Thr RawValues(7)");
+			fmt = _T("Cur Wor Thr RawValue(7)");
 		else
-			fmt = _T("Cur Wor --- RawValues(7)");
+			fmt = _T("Cur Wor --- RawValue(7)");
 	}
 	else if (ptr->vars[index].DiskVendorId == CAtaSmart::SSD_VENDOR_JMICRON
 		&& ptr->vars[index].IsRawValues8)
-		fmt = _T("Cur RawValues(8)");
+		fmt = _T("Cur RawValue(8)");
 	else if (ptr->vars[index].DiskVendorId == CAtaSmart::SSD_VENDOR_INDILINX)
-		fmt = _T("RawValues(8)");
+		fmt = _T("RawValue(8)");
 	else if (ptr->vars[index].DiskVendorId == CAtaSmart::SSD_VENDOR_NVME)
-		fmt = _T("RawValues(7)");
+		fmt = _T("RawValue(7)");
 	else
 	{
 		if (ptr->vars[index].IsThresholdCorrect)
-			fmt = _T("Cur Wor Thr RawValues(6)");
+			fmt = _T("Cur Wor Thr RawValue(6)");
 		else
-			fmt = _T("Cur Wor --- RawValues(6)");
+			fmt = _T("Cur Wor --- RawValue(6)");
 	}
-		
+
 	return cs_to_wcs(fmt);
 }
 
