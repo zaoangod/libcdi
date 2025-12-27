@@ -58,7 +58,8 @@ XString xs_new(const char *value) {
         return sb;
     }
 
-    strcpy(sb.data, value);
+    // strcpy(sb.data, value);
+    strcpy_s(sb.data, sizeof(sb.data), value);
     return sb;
 }
 
@@ -272,6 +273,13 @@ int main(int argc, char* argv[])
 			xs_free(&xs);
 			break;
 		case PARTITION_STYLE_GPT:
+			XString gpt_guid = xs_new("");
+			xs_append_format(&gpt_guid, "{%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X}",
+				pdInfo[i].MbrSignature[0], pdInfo[i].MbrSignature[1], pdInfo[i].MbrSignature[2], pdInfo[i].MbrSignature[3]);
+			cJSON_AddStringToObject(physicalDriveItem, "MbrSignature", gpt_guid.data);
+			xs_free(&gpt_guid);
+
+
 			char gpt_guid[64] = {0};
 			sprintf_s(
 				gpt_guid,
