@@ -344,7 +344,7 @@ int main(int argc, char* argv[])
 			cJSON_AddStringToObject(volumeItem, "FS", Ucs2ToUtf8(p->VolFs));
 			cJSON_AddStringToObject(volumeItem, "FreeSpace", GetHumanSize(p->VolFreeSpace.QuadPart, 1024));
 			cJSON_AddStringToObject(volumeItem, "TotalSpace", GetHumanSize(p->VolTotalSpace.QuadPart, 1024));
-			// cJSON_AddNumberToObject(volumeItem, "Usage", p->VolUsage);
+			cJSON_AddNumberToObject(volumeItem, "Usage", p->VolUsage);
 
 			XString mountPoint = xs_new("");
 			for (WCHAR* q = p->VolNames; q[0] != L'\0'; q += wcslen(q) + 1)
