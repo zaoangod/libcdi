@@ -4,7 +4,7 @@
 #include "smartids.h"
 
 #define LIBCDI_IMPLEMENTATION
-#include "libcdi.h"
+#include "cdi.h"
 
 #include "UtilityFx.h"
 

@@ -17,5 +17,4 @@
 #define LIBCDI_COPYRIGHT    "(C) 2025 A1ive, (C) 2008-2025 hiyohiyo"
 #define LIBCDI_FILEDESC     "CrystalDiskInfo DLL"
 
-#define LIBCDI_DLL          "libcdi"
-
+#define LIBCDI_DLL          "cdi"

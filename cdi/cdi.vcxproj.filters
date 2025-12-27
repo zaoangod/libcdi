@@ -21,7 +21,7 @@
     <ClCompile Include="AtaSmart.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="libcdi.cpp">
+    <ClCompile Include="cdi.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="NVMeInterpreter.cpp">
@@ -44,7 +44,7 @@
     <ClInclude Include="AtaSmart.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="libcdi.h">
+    <ClInclude Include="cdi.h">
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="NVMeInterpreter.h">

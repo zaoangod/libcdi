@@ -3,9 +3,9 @@
 #include <windows.h>
 #include <stdio.h>
 
-#include "../libcdi/libcdi.h"
+#include "../cdi/cdi.h"
 #include "disklib.h"
-#pragma comment(lib, "libcdi.lib")
+#pragma comment(lib, "cdi.lib")
 #pragma comment(lib, "setupapi.lib")
 
 static INT

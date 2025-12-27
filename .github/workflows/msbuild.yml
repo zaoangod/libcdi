@@ -33,7 +33,7 @@ jobs:
 
       - name: Stage artifacts for packaging
         run: |
-          $executables = "libcdi.dll", "cli.exe"
+          $executables = "cdi.dll", "cli.exe"
           $platformMap = @{
               "x64/Release"   = "build/x64"
           }
@@ -43,7 +43,7 @@ jobs:
                   Move-Item -Path "$($entry.Name)/$exe" -Destination "$($entry.Value)/"
               }
           }
-          Copy-Item -Path "libcdi/libcdi.h" -Destination "build/libcdi.h"
+          Copy-Item -Path "cdi/cdi.h" -Destination "build/cdi.h"
           Copy-Item -Path "LICENSE.txt" -Destination "build/LICENSE.txt"
           Copy-Item -Path "README.md" -Destination "build/README.md"
 

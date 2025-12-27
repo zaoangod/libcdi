@@ -3,7 +3,7 @@
 #include "disklib.h"
 #include <stdio.h>
 #include <setupapi.h>
-#include "../libcdi/libcdi.h"
+#include "../cdi/cdi.h"
 
 #define DISKLIB_BUFSZ 0x10000
 #define DISKLIB_BUFSZW (DISKLIB_BUFSZ / sizeof(WCHAR))

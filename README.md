@@ -1,7 +1,7 @@
 ﻿
-# libcdi
+# cdi
 
-![GitHub License](https://img.shields.io/github/license/a1ive/libcdi) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/a1ive/libcdi/msbuild.yml)
+![GitHub License](https://img.shields.io/github/license/a1ive/cdi) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/a1ive/cdi/msbuild.yml)
 
 
 Dynamic library for accessing S.M.A.R.T. information, based on [CrystalDiskInfo](https://github.com/hiyohiyo/CrystalDiskInfo).
