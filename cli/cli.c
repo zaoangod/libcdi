@@ -2,9 +2,12 @@
 #define VC_EXTRALEAN
 #include <windows.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "../cdi/cdi.h"
 #include "disklib.h"
+#include "cJSON.h"
+
 #pragma comment(lib, "cdi.lib")
 #pragma comment(lib, "setupapi.lib")
 
@@ -103,17 +106,36 @@ int main(int argc, char* argv[])
 	(void)CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 	cdiSmart = cdi_create_smart();
 
-	printf("{\n");
-	printf("    \"Version\": \"%s\",\n", cdi_get_version());
+	// 创建一个json对象
+	cJSON *diskInfo = cJSON_CreateObject();
+	if (diskInfo == NULL) {
+        fprintf(stderr, "创建信息对象失败");
+		return 1;
+	}
+    cJSON_AddStringToObject(diskInfo, "Version", cdi_get_version());
 
 	dwCount = GetDriveInfoList(FALSE, &pdInfo);
-	printf("    \"DiskCount\": %lu,\n", dwCount);
+	cJSON_AddNumberToObject(diskInfo, "DiskCount", dwCount);
 
 	cdi_init_smart(cdiSmart, CDI_FLAG_DEFAULT);
 
-	printf("    \"PhysicalDrive\": [\n");
+	// 创建物理硬盘列表
+	cJSON *physicalDriveList = cJSON_CreateArray();
+
 	for (DWORD i = 0; i < dwCount; i++)
 	{
+		cJSON *physicalDriveItem = cJSON_CreateObject();
+		cJSON_AddNumberToObject(physicalDriveItem, "Index", pdInfo[i].Index);
+		cJSON_AddStringToObject(physicalDriveItem, "HWID", Ucs2ToUtf8(pdInfo[i].HwID));
+		cJSON_AddStringToObject(physicalDriveItem, "Model", Ucs2ToUtf8(pdInfo[i].HwName));
+		cJSON_AddStringToObject(physicalDriveItem, "Size", GetHumanSize(pdInfo[i].SizeInBytes, 1024));
+		cJSON_AddStringToObject(physicalDriveItem, "RemovableMedia", pdInfo[i].RemovableMedia ? "Yes" : "No");
+		cJSON_AddStringToObject(physicalDriveItem, "VendorId", pdInfo[i].VendorId);
+		cJSON_AddStringToObject(physicalDriveItem, "ProductId", pdInfo[i].ProductId);
+		cJSON_AddStringToObject(physicalDriveItem, "ProductRev", pdInfo[i].ProductRev);
+		cJSON_AddStringToObject(physicalDriveItem, "BusType", GetBusTypeName(pdInfo[i].BusType));
+		cJSON_AddStringToObject(physicalDriveItem, "PartitionTable", GetPartMapName(pdInfo[i].PartMap));
+
 		printf("        {\n");
 		printf("            \"Index\": %lu,\n", pdInfo[i].Index);
 		printf("            \"HWID\": \"%s\",\n", Ucs2ToUtf8(pdInfo[i].HwID));
@@ -128,15 +150,18 @@ int main(int argc, char* argv[])
 		switch(pdInfo[i].PartMap)
 		{
 		case PARTITION_STYLE_MBR:
-			printf("            \"MBR_Signature\": \"%02X %02X %02X %02X\",\n",
+			char mbr_signature[32] = {0};
+			sprintf(mbr_signature, "%02X %02X %02X %02X",
 				pdInfo[i].MbrSignature[0],
 				pdInfo[i].MbrSignature[1],
 				pdInfo[i].MbrSignature[2],
 				pdInfo[i].MbrSignature[3]
 			);
+			cJSON_AddStringToObject(physicalDriveItem, "MbrSignature", mbr_signature);
 			break;
 		case PARTITION_STYLE_GPT:
-			printf("            \"GPT_GUID\": \"{%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X}\",\n",
+			char gpt_guid[64] = {0};
+			sprintf(gpt_guid, "{%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X}",
 				pdInfo[i].GptGuid[0],
 				pdInfo[i].GptGuid[1],
 				pdInfo[i].GptGuid[2],
@@ -154,6 +179,7 @@ int main(int argc, char* argv[])
 				pdInfo[i].GptGuid[14],
 				pdInfo[i].GptGuid[15]
 			);
+			cJSON_AddStringToObject(physicalDriveItem, "GptGuid", gpt_guid);
 			break;
 		}
 
@@ -196,5 +222,17 @@ int main(int argc, char* argv[])
 	cdi_destroy_smart(cdiSmart);
 	DestoryDriveInfoList(pdInfo, dwCount);
 	CoUninitialize();
+
+	// 将 JSON 结构转换为格式化的字符串
+	char *diskInfoJson = cJSON_Print(diskInfo);
+	if (diskInfoJson == NULL) {
+        fprintf(stderr, "格式化输出内容异常");
+		cJSON_Delete(diskInfo);
+		return 1;
+	}
+	printf("%s", diskInfoJson);
+	free(diskInfoJson);
+	cJSON_Delete(diskInfo);
+
 	return 0;
 }
