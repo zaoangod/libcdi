@@ -188,7 +188,7 @@ int main(int argc, char* argv[])
 		}
 
 		printf("            ]\n");
-		printf("%s", i < dwCount ? "    },\n" : "}\n");
+		printf("%s", (i + 1) < dwCount ? "        },\n" : "}\n");
 	}
 	printf("    ]\n");
 	printf("}\n");
