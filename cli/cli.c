@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
 	// 创建一个json对象
 	cJSON *diskInfo = cJSON_CreateObject();
 	if (diskInfo == NULL) {
-        fprintf(stderr, "创建信息对象失败");
+        fprintf(stderr, "create info object exception");
 		return 1;
 	}
     cJSON_AddStringToObject(diskInfo, "Version", cdi_get_version());
@@ -226,7 +226,7 @@ int main(int argc, char* argv[])
 	// 将 JSON 结构转换为格式化的字符串
 	char *diskInfoJson = cJSON_Print(diskInfo);
 	if (diskInfoJson == NULL) {
-        fprintf(stderr, "格式化输出内容异常");
+        fprintf(stderr, "format output exception");
 		cJSON_Delete(diskInfo);
 		return 1;
 	}
