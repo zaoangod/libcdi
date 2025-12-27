@@ -221,6 +221,8 @@ int main(int argc, char* argv[])
 
 		printf("            ]\n");
 		printf("%s", (i + 1) < dwCount ? "        },\n" : "        }\n");
+
+		cJSON_AddItemToArray(physicalDriveList, physicalDriveItem);
 	}
 	printf("    ]\n");
 	printf("}\n");
@@ -236,11 +238,9 @@ int main(int argc, char* argv[])
 		cJSON_Delete(diskInfo);
 		return 1;
 	}
-	printf("-----------------");
 	printf("%s", diskInfoJson);
 	free(diskInfoJson);
 	cJSON_Delete(diskInfo);
-	printf("-----------------");
 
 	return 0;
 }
