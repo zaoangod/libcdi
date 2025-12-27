@@ -160,7 +160,7 @@ int main(int argc, char* argv[])
 		PrintSmartInfo(cdiSmart, &pdInfo[i], GetSmartIndex(cdiSmart, pdInfo[i].Index));
 		for (DWORD j = 0; j < pdInfo[i].VolCount; j++)
 		{
-			printf("            \"Volume\": {");
+			printf("            \"Volume\": {\n");
 
 			DISK_VOL_INFO* p = &pdInfo[i].VolInfo[j];
 			// printf("\t%s\n", Ucs2ToUtf8(p->VolPath));
@@ -182,10 +182,8 @@ int main(int argc, char* argv[])
 				printf("%s", Ucs2ToUtf8(q));
 			}
 			printf("\"\n");
-
 			printf("            }%s\n", j < pdInfo[i].VolCount ? "," : "");
 		}
-		printf("    }");
 		printf("%s", i < dwCount ? "    },\n" : "}\n");
 	}
 	printf("    ]\n");
