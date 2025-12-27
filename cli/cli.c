@@ -199,8 +199,8 @@ int main(int argc, char* argv[])
 			cJSON *volumeItem = cJSON_CreateObject();
 			cJSON_AddItemToArray(volumeList, volumeItem);
 			cJSON_AddStringToObject(volumeItem, "Volume", Ucs2ToUtf8(p->VolPath));
-			cJSON_AddStringToObject(volumeItem, "StartLBA",  cJSON_CreateNumber(p->StartLba));
-			cJSON_AddStringToObject(volumeItem, "PartitionNumber", cJSON_CreateNumber(p->PartNum));
+			cJSON_AddNumberToObject(volumeItem, "StartLBA",  cJSON_CreateNumber(p->StartLba));
+			cJSON_AddNumberToObject(volumeItem, "PartitionNumber", cJSON_CreateNumber(p->PartNum));
 			cJSON_AddStringToObject(volumeItem, "PartitionType", Ucs2ToUtf8(p->PartType));
 			cJSON_AddStringToObject(volumeItem, "PartitionID", Ucs2ToUtf8(p->PartId));
 			cJSON_AddStringToObject(volumeItem, "BootIndicator", p->BootIndicator ? "Yes" : "No");
