@@ -121,7 +121,7 @@ int main(int argc, char* argv[])
 
 	// 创建物理硬盘列表
 	cJSON *physicalDriveList = cJSON_CreateArray();
-    cJSON_AddItemToObject(root, "PhysicalDriveList", physicalDriveList);
+    cJSON_AddItemToObject(diskInfo, "PhysicalDriveList", physicalDriveList);
 
 	for (DWORD i = 0; i < dwCount; i++)
 	{
