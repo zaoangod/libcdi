@@ -343,15 +343,14 @@ int main(int argc, char* argv[])
 			cJSON_AddStringToObject(volumeItem, "FreeSpace", GetHumanSize(p->VolFreeSpace.QuadPart, 1024));
 			cJSON_AddStringToObject(volumeItem, "TotalSpace", GetHumanSize(p->VolTotalSpace.QuadPart, 1024));
 			// cJSON_AddNumberToObject(volumeItem, "Usage", p->VolUsage);
-			cJSON_AddStringToObject(volumeItem, "MountPoint", p->VolNames);
 
-			// XString mountPoint = xs_new("");
-			// for (WCHAR* q = p->VolNames; q[0] != L'\0'; q += wcslen(q) + 1)
-			// {
-			// 	xs_append_format(&mountPoint, "%s", Ucs2ToUtf8(q));
-			// }
-			// cJSON_AddStringToObject(volumeItem, "MountPoint", mountPoint.data);
-			// xs_free(&mountPoint);
+			XString mountPoint = xs_new("");
+			for (WCHAR* q = p->VolNames; q[0] != L'\0'; q += wcslen(q) + 1)
+			{
+				xs_append_format(&mountPoint, "%s", Ucs2ToUtf8(q));
+			}
+			cJSON_AddStringToObject(volumeItem, "MountPoint", mountPoint.data);
+			xs_free(&mountPoint);
 		}
 	}
 
