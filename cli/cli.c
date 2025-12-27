@@ -164,7 +164,7 @@ PrintSmartInfo(cJSON *physicalDriveItem, CDI_SMART* cdiSmart, PHY_DRIVE_INFO* pd
 	DWORD n;
 	WCHAR* str;
 	BOOL ssd;
-	BYTE id;
+	//BYTE id;
 
 	if (nIndex < 0)
 	{
