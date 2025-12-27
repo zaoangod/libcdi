@@ -158,7 +158,7 @@ GetSmartIndex(CDI_SMART* cdiSmart, DWORD dwId)
 }
 
 static VOID
-PrintSmartInfo(CDI_SMART* cdiSmart, PHY_DRIVE_INFO* pdInfo, INT nIndex)
+PrintSmartInfo(cJSON *physicalDriveItem, CDI_SMART* cdiSmart, PHY_DRIVE_INFO* pdInfo, INT nIndex)
 {
 	INT d;
 	DWORD n;
@@ -306,7 +306,7 @@ int main(int argc, char* argv[])
 			break;
 		}
 
-		PrintSmartInfo(cdiSmart, &pdInfo[i], GetSmartIndex(cdiSmart, pdInfo[i].Index));
+		PrintSmartInfo(physicalDriveItem, cdiSmart, &pdInfo[i], GetSmartIndex(cdiSmart, pdInfo[i].Index));
 
 		cJSON *volumeList = cJSON_CreateArray();
 
@@ -323,7 +323,6 @@ int main(int argc, char* argv[])
 			cJSON_AddItemToArray(volumeList, volumeItem);
 
 			cJSON_AddStringToObject(volumeItem, "Volume", Ucs2ToUtf8(p->VolPath));
-			// cJSON_AddNumberToObject(volumeItem, "StartLba", p->StartLba);
 			cJSON_AddStringToObject(volumeItem, "StartLba", startLbaText);
 			cJSON_AddNumberToObject(volumeItem, "PartitionNumber", p->PartNum);
 			cJSON_AddStringToObject(volumeItem, "PartitionType", Ucs2ToUtf8(p->PartType));
