@@ -145,17 +145,6 @@ void xs_free(XString *x_string) {
 // ----------------------------------X-String end----------------------------------
 // --------------------------------------------------------------------------------
 
-// ---------------------------------------------------------------------------------
-// ----------------------------------convert start----------------------------------
-// ---------------------------------------------------------------------------------
-// 封装成通用函数：输入UINT64值，输出字符串缓冲区
-void uint64_to_string(uint64_t num, char *result, size_t buffer_size) {
-	snprintf(result, buffer_size, "%" PRIu64, num);
-}
-// -------------------------------------------------------------------------------
-// ----------------------------------convert end----------------------------------
-// -------------------------------------------------------------------------------
-
 static INT
 GetSmartIndex(CDI_SMART* cdiSmart, DWORD dwId)
 {
@@ -327,14 +316,15 @@ int main(int argc, char* argv[])
 		{
 			DISK_VOL_INFO* p = &pdInfo[i].VolInfo[j];
 
-			// char startLba[21];
-			// uint64_to_string(p->StartLba, startLba, sizeof(startLba));
+			char startLbaText[32] = {0};
+			snprintf(startLbaText, sizeof(startLbaText), "%" PRIu64, p->StartLba);
 
 			cJSON *volumeItem = cJSON_CreateObject();
 			cJSON_AddItemToArray(volumeList, volumeItem);
 
 			cJSON_AddStringToObject(volumeItem, "Volume", Ucs2ToUtf8(p->VolPath));
-			cJSON_AddNumberToObject(volumeItem, "StartLba", p->StartLba);
+			// cJSON_AddNumberToObject(volumeItem, "StartLba", p->StartLba);
+			cJSON_AddStringToObject(volumeItem, "StartLba", startLbaText);
 			cJSON_AddNumberToObject(volumeItem, "PartitionNumber", p->PartNum);
 			cJSON_AddStringToObject(volumeItem, "PartitionType", Ucs2ToUtf8(p->PartType));
 			cJSON_AddStringToObject(volumeItem, "PartitionID", Ucs2ToUtf8(p->PartId));
