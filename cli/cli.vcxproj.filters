@@ -21,12 +21,18 @@
     <ClCompile Include="disklib.c">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="cJSON.c">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="disklib.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="cJSON.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
