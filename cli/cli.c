@@ -161,14 +161,13 @@ static VOID
 PrintSmartInfo(cJSON *physicalDriveItem, CDI_SMART* cdiSmart, PHY_DRIVE_INFO* pdInfo, INT nIndex)
 {
 	INT d;
-	DWORD n;
+	//DWORD n;
 	WCHAR* str;
 	BOOL ssd;
 	//BYTE id;
 
 	if (nIndex < 0)
 	{
-		// cJSON_AddNumberToObject(physicalDriveItem, "Index", pdInfo[i].Index);
 		cJSON_AddStringToObject(physicalDriveItem, "SSD", pdInfo->Ssd ? "Yes" : "No");
 		cJSON_AddStringToObject(physicalDriveItem, "SerialNumber", pdInfo->SerialNumber);
 		return;
