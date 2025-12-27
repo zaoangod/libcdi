@@ -315,8 +315,8 @@ int main(int argc, char* argv[])
 		{
 			DISK_VOL_INFO* p = &pdInfo[i].VolInfo[j];
 
-			cJSON *volumeItem = cJSON_CreateObject();
-			cJSON_AddItemToArray(volumeList, volumeItem);
+			// cJSON *volumeItem = cJSON_CreateObject();
+			// cJSON_AddItemToArray(volumeList, volumeItem);
 			// cJSON_AddStringToObject(volumeItem, "Volume", Ucs2ToUtf8(p->VolPath));
 			// cJSON_AddNumberToObject(volumeItem, "StartLBA", p->StartLba);
 			// cJSON_AddNumberToObject(volumeItem, "PartitionNumber", p->PartNum);
@@ -335,7 +335,7 @@ int main(int argc, char* argv[])
 			{
 				xs_append_format(&xs, "%s", Ucs2ToUtf8(q));
 			}
-			cJSON_AddStringToObject(volumeItem, "MountPoint", xs.data);
+			// cJSON_AddStringToObject(volumeItem, "MountPoint", xs.data);
 			xs_free(&xs);
 		}
 	}
