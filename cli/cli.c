@@ -157,8 +157,9 @@ int main(int argc, char* argv[])
 			break;
 		}
 
-		printf("            \"VolumeList\": [\n");
 		PrintSmartInfo(cdiSmart, &pdInfo[i], GetSmartIndex(cdiSmart, pdInfo[i].Index));
+
+		printf("            \"VolumeList\": [\n");
 		for (DWORD j = 0; j < pdInfo[i].VolCount; j++)
 		{
 			printf("                {\n");
