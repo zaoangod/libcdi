@@ -7,6 +7,7 @@
 #include "../cdi/cdi.h"
 #include "disklib.h"
 #include "cJSON.h"
+#include "u_string.h"
 
 #pragma comment(lib, "cdi.lib")
 #pragma comment(lib, "setupapi.lib")
@@ -209,12 +210,16 @@ int main(int argc, char* argv[])
 			cJSON_AddStringToObject(volumeItem, "FreeSpace", GetHumanSize(p->VolFreeSpace.QuadPart, 1024));
 			cJSON_AddStringToObject(volumeItem, "TotalSpace", GetHumanSize(p->VolTotalSpace.QuadPart, 1024));
 			cJSON_AddStringToObject(volumeItem, "Usage", p->VolUsage);
-			cJSON_AddStringToObject(volumeItem, "MountPoint", "");
 
+			UString *mountPointValue;
+			u_string_new(mountPointValue);
 			for (WCHAR* q = p->VolNames; q[0] != L'\0'; q += wcslen(q) + 1)
 			{
-				printf("%s", Ucs2ToUtf8(q));
+				u_string_join(mountPointValue, "%s", Ucs2ToUtf8(q));
+				// printf("%s", Ucs2ToUtf8(q));
 			}
+			cJSON_AddStringToObject(volumeItem, "MountPoint", u_string_body(mountPointValue));
+			u_string_free(mountPointValue);
 		}
 	}
 	printf("    ]\n");

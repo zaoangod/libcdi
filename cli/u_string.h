@@ -30,7 +30,7 @@ typedef struct {
     size_t i; /* index of first unused byte */
 } UString;
 
-#define utstring_reserve(s,amt)                            \
+#define u_string_reserve(s,amt)                            \
 do {                                                       \
   if (((s)->n - (s)->i) < (size_t)(amt)) {                 \
     char *utstring_tmp = (char*)realloc(                   \
@@ -43,68 +43,68 @@ do {                                                       \
   }                                                        \
 } while(0)
 
-#define utstring_init(s)                                   \
+#define u_string_init(s)                                   \
 do {                                                       \
   (s)->n = 0; (s)->i = 0; (s)->d = NULL;                   \
-  utstring_reserve(s,100);                                 \
+  u_string_reserve(s,100);                                 \
   (s)->d[0] = '\0';                                        \
 } while(0)
 
-#define utstring_done(s)                                   \
+#define u_string_done(s)                                   \
 do {                                                       \
   if ((s)->d != NULL) free((s)->d);                        \
   (s)->n = 0;                                              \
 } while(0)
 
-#define utstring_free(s)                                   \
+#define u_string_free(s)                                   \
 do {                                                       \
-  utstring_done(s);                                        \
+  u_string_done(s);                                        \
   free(s);                                                 \
 } while(0)
 
-#define utstring_new(s)                                    \
+#define u_string_new(s)                                    \
 do {                                                       \
-  (s) = (UString*)malloc(sizeof(UString));             \
+  (s) = (UString*)malloc(sizeof(UString));                 \
   if (!(s)) {                                              \
     utstring_oom();                                        \
   }                                                        \
-  utstring_init(s);                                        \
+  u_string_init(s);                                        \
 } while(0)
 
-#define utstring_renew(s)                                  \
+#define u_string_renew(s)                                  \
 do {                                                       \
    if (s) {                                                \
-     utstring_clear(s);                                    \
+     u_string_clear(s);                                    \
    } else {                                                \
-     utstring_new(s);                                      \
+     u_string_new(s);                                      \
    }                                                       \
 } while(0)
 
-#define utstring_clear(s)                                  \
+#define u_string_clear(s)                                  \
 do {                                                       \
   (s)->i = 0;                                              \
   (s)->d[0] = '\0';                                        \
 } while(0)
 
-#define utstring_bincpy(s,b,l)                             \
+#define u_string_binary_copy(s,b,l)                        \
 do {                                                       \
-  utstring_reserve((s),(l)+1);                             \
+  u_string_reserve((s),(l)+1);                             \
   if (l) memcpy(&(s)->d[(s)->i], b, l);                    \
   (s)->i += (l);                                           \
   (s)->d[(s)->i]='\0';                                     \
 } while(0)
 
-#define utstring_concat(dst,src)                                 \
+#define u_string_concat(dst,src)                                 \
 do {                                                             \
-  utstring_reserve((dst),((src)->i)+1);                          \
+  u_string_reserve((dst),((src)->i)+1);                          \
   if ((src)->i) memcpy(&(dst)->d[(dst)->i], (src)->d, (src)->i); \
   (dst)->i += (src)->i;                                          \
   (dst)->d[(dst)->i]='\0';                                       \
 } while(0)
 
-#define utstring_len(s) ((s)->i)
+#define u_string_length(s) ((s)->i)
 
-#define utstring_body(s) ((s)->d)
+#define u_string_body(s) ((s)->d)
 
 UTSTRING_UNUSED static void utstring_printf_va(UString *s, const char *fmt, va_list ap) {
    int n;
@@ -124,16 +124,16 @@ UTSTRING_UNUSED static void utstring_printf_va(UString *s, const char *fmt, va_l
       }
 
       /* Else try again with more space. */
-      if (n > -1) utstring_reserve(s,n+1); /* exact */
-      else utstring_reserve(s,(s->n)*2);   /* 2x */
+      if (n > -1) u_string_reserve(s,n+1); /* exact */
+      else u_string_reserve(s,(s->n)*2);   /* 2x */
    }
 }
 #ifdef __GNUC__
 /* support printf format checking (2=the format string, 3=start of varargs) */
-static void utstring_printf(UString *s, const char *fmt, ...)
+static void u_string_join(UString *s, const char *fmt, ...)
   __attribute__((format(printf, 2, 3)));
 #endif
-UTSTRING_UNUSED static void utstring_printf(UString *s, const char *fmt, ...) {
+UTSTRING_UNUSED static void u_string_join(UString *s, const char *fmt, ...) {
    va_list ap;
    va_start(ap,fmt);
    utstring_printf_va(s,fmt,ap);
