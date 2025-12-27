@@ -168,67 +168,75 @@ PrintSmartInfo(cJSON *physicalDriveItem, CDI_SMART* cdiSmart, PHY_DRIVE_INFO* pd
 
 	if (nIndex < 0)
 	{
-		printf("            \"SSD\": \"%s\",\n", pdInfo->Ssd ? "\"Yes\"" : "\"No\"");
-		printf("            \"Serial\": \"%s\",\n", pdInfo->SerialNumber);
+		// cJSON_AddNumberToObject(physicalDriveItem, "Index", pdInfo[i].Index);
+		cJSON_AddStringToObject(physicalDriveItem, "SSD", pdInfo->Ssd ? "Yes" : "No");
+		cJSON_AddStringToObject(physicalDriveItem, "SerialNumber", pdInfo->SerialNumber);
 		return;
 	}
 
 	cdi_update_smart(cdiSmart, nIndex);
 
 	ssd = cdi_get_bool(cdiSmart, nIndex, CDI_BOOL_SSD);
-	printf("            \"SSD\": \"%s\",\n", ssd ? "\"Yes\"" : "\"No\"");
+	cJSON_AddStringToObject(physicalDriveItem, "SSD", ssd ? "Yes" : "No");
 
 	str = cdi_get_string(cdiSmart, nIndex, CDI_STRING_SN);
-	printf("            \"Serial\": \"%s\",\n", Ucs2ToUtf8(str));
+	cJSON_AddStringToObject(physicalDriveItem, "SerialNumber", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
 	str = cdi_get_string(cdiSmart, nIndex, CDI_STRING_FIRMWARE);
-	printf("            \"Firmware\": \"%s\",\n", Ucs2ToUtf8(str));
+	cJSON_AddStringToObject(physicalDriveItem, "Firmware", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
 	str = cdi_get_string(cdiSmart, nIndex, CDI_STRING_INTERFACE);
-	printf("            \"Interface\": \"%s\",\n", Ucs2ToUtf8(str));
+	cJSON_AddStringToObject(physicalDriveItem, "Interface", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
 	str = cdi_get_string(cdiSmart, nIndex, CDI_STRING_TRANSFER_MODE_CUR);
-	printf("            \"CurrentTransferMode\": \"%s\",\n", Ucs2ToUtf8(str));
+	cJSON_AddStringToObject(physicalDriveItem, "CurrentTransferMode", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
 	str = cdi_get_string(cdiSmart, nIndex, CDI_STRING_TRANSFER_MODE_MAX);
-	printf("            \"MaxTransferMode\": \"%s\",\n", Ucs2ToUtf8(str));
+	cJSON_AddStringToObject(physicalDriveItem, "MaxTransferMode", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
 	str = cdi_get_string(cdiSmart, nIndex, CDI_STRING_FORM_FACTOR);
-	printf("            \"FormFactor\": \"%s\",\n", Ucs2ToUtf8(str));
+	cJSON_AddStringToObject(physicalDriveItem, "FormFactor", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
 	d = cdi_get_int(cdiSmart, nIndex, CDI_INT_LIFE);
 	if (d >= 0)
-		printf("            \"HealthStatus\": \"%s (%d%%)\",\n", cdi_get_health_status(cdi_get_int(cdiSmart, nIndex, CDI_INT_DISK_STATUS)), d);
+		XString healthStatus = xs_new("");
+		xs_append_format(&healthStatus, "%s (%d%%)", cdi_get_health_status(cdi_get_int(cdiSmart, nIndex, CDI_INT_DISK_STATUS)), d);
+		cJSON_AddStringToObject(physicalDriveItem, "HealthStatus", healthStatus.data);
+		xs_free(&healthStatus);
 	else
-		printf("            \"HealthStatus\": \"%s\",\n", cdi_get_health_status(cdi_get_int(cdiSmart, nIndex, CDI_INT_DISK_STATUS)));
+		cJSON_AddStringToObject(physicalDriveItem, "HealthStatus", cdi_get_health_status(cdi_get_int(cdiSmart, nIndex, CDI_INT_DISK_STATUS)));
 
-	printf("            \"Temperature:\" \"%d (C)\",\n", cdi_get_int(cdiSmart, nIndex, CDI_INT_TEMPERATURE));
+
+	XString temperature = xs_new("");
+	xs_append_format(&temperature, "%d (C)", cdi_get_int(cdiSmart, nIndex, CDI_INT_TEMPERATURE));
+	cJSON_AddStringToObject(physicalDriveItem, "Temperature", temperature.data);
+	xs_free(&temperature);
 
 	str = cdi_get_smart_format(cdiSmart, nIndex);
 	Ucs2ToUtf8(str);
-	printf("            \"StatusRawValue\": ");
+	cJSON_AddStringToObject(physicalDriveItem, "StatusRawValue", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
-	n = cdi_get_dword(cdiSmart, nIndex, CDI_DWORD_ATTR_COUNT);
-	for (INT j = 0; j < (INT)n; j++)
-	{
-		id = cdi_get_smart_id(cdiSmart, nIndex, j);
-		if (id == 0x00)
-			continue;
-		str = cdi_get_smart_value(cdiSmart, nIndex, j, FALSE);
-		printf("\t%02X %7s %-24s",
-			id,
-			cdi_get_health_status(cdi_get_smart_status(cdiSmart, nIndex, j)),
-			Ucs2ToUtf8(str));
-		printf(" %s\n", Ucs2ToUtf8(cdi_get_smart_name(cdiSmart, nIndex, id)));
-		cdi_free_string(str);
-	}
+	//n = cdi_get_dword(cdiSmart, nIndex, CDI_DWORD_ATTR_COUNT);
+	//for (INT j = 0; j < (INT)n; j++)
+	//{
+	//	id = cdi_get_smart_id(cdiSmart, nIndex, j);
+	//	if (id == 0x00)
+	//		continue;
+	//	str = cdi_get_smart_value(cdiSmart, nIndex, j, FALSE);
+	//	printf("\t%02X %7s %-24s",
+	//		id,
+	//		cdi_get_health_status(cdi_get_smart_status(cdiSmart, nIndex, j)),
+	//		Ucs2ToUtf8(str));
+	//	printf(" %s\n", Ucs2ToUtf8(cdi_get_smart_name(cdiSmart, nIndex, id)));
+	//	cdi_free_string(str);
+	//}
 }
 
 int main(int argc, char* argv[])
