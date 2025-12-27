@@ -23,7 +23,7 @@
 // 默认初始容量
 #define XS_DEFAULT_CAPACITY 256
 
-// 动态字符串结构体（对外暴露，方便用户操作）
+// 动态字符串结构体
 typedef struct XString {
     char *data; // 字符串数据
     size_t length; // 有效字符长度（不含'\0'）
@@ -241,6 +241,8 @@ PrintSmartInfo(cJSON *physicalDriveItem, CDI_SMART* cdiSmart, PHY_DRIVE_INFO* pd
 		xs_append_format(&temperature, " %s\n", Ucs2ToUtf8(cdi_get_smart_name(cdiSmart, nIndex, id)));
 		cdi_free_string(str);
 	}
+	cJSON_AddStringToObject(physicalDriveItem, "StatusRawValue", statusRawValue.data);
+	xs_free(&statusRawValue);
 }
 
 int main(int argc, char* argv[])
