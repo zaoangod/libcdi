@@ -309,7 +309,7 @@ int main(int argc, char* argv[])
 		PrintSmartInfo(cdiSmart, &pdInfo[i], GetSmartIndex(cdiSmart, pdInfo[i].Index));
 
 		printf("            \"VolumeList\": [\n");
-		cJSON *volumeList = cJSON_CreateArray();
+		// cJSON *volumeList = cJSON_CreateArray();
 
 		for (DWORD j = 0; j < pdInfo[i].VolCount; j++)
 		{
