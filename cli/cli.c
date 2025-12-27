@@ -253,6 +253,8 @@ int main(int argc, char* argv[])
 	for (DWORD i = 0; i < dwCount; i++)
 	{
 		cJSON *physicalDriveItem = cJSON_CreateObject();
+		cJSON_AddItemToArray(physicalDriveList, physicalDriveItem);
+
 		cJSON_AddNumberToObject(physicalDriveItem, "Index", pdInfo[i].Index);
 		cJSON_AddStringToObject(physicalDriveItem, "HWID", Ucs2ToUtf8(pdInfo[i].HwID));
 		cJSON_AddStringToObject(physicalDriveItem, "Model", Ucs2ToUtf8(pdInfo[i].HwName));
@@ -304,41 +306,40 @@ int main(int argc, char* argv[])
 
 		PrintSmartInfo(cdiSmart, &pdInfo[i], GetSmartIndex(cdiSmart, pdInfo[i].Index));
 
-		printf("            \"VolumeList\": [\n");
+		cJSON *volumeList = cJSON_CreateArray();
+
+		cJSON_AddItemToObject(physicalDriveItem, "VolumeList", volumeList);
+
 		for (DWORD j = 0; j < pdInfo[i].VolCount; j++)
 		{
-			printf("                {\n");
-
 			DISK_VOL_INFO* p = &pdInfo[i].VolInfo[j];
-			// printf("\t%s\n", Ucs2ToUtf8(p->VolPath));
-			printf("                    \"Volume\": \"%s\",\n", Ucs2ToUtf8(p->VolPath));
-			printf("                    \"StartLBA\": %llu,\n", p->StartLba);
-			printf("                    \"PartitionNumber\": %lu\n", p->PartNum);
-			printf("                    \"PartitionType\": \"%s\",\n", Ucs2ToUtf8(p->PartType));
-			printf("                    \"PartitionID\": \"%s\",\n", Ucs2ToUtf8(p->PartId));
-			printf("                    \"BootIndicator\": \"%s\",\n", p->BootIndicator ? "Yes" : "No");
-			printf("                    \"PartitionFlag\": \"%s\",\n", Ucs2ToUtf8(p->PartFlag));
-			printf("                    \"Label\": \"%s\",\n", Ucs2ToUtf8(p->VolLabel));
-			printf("                    \"FS\": \"%s\",\n", Ucs2ToUtf8(p->VolFs));
-			printf("                    \"FreeSpace\": \"%s\",\n", GetHumanSize(p->VolFreeSpace.QuadPart, 1024));
-			printf("                    \"TotalSpace\": \"%s\",\n", GetHumanSize(p->VolTotalSpace.QuadPart, 1024));
-			printf("                    \"Usage\": \"%.2f%%\",\n", p->VolUsage);
-			printf("                    \"MountPoint\": \"");
+
+			cJSON *volumeItem = cJSON_CreateObject();
+			cJSON_AddItemToArray(volumeList, volumeItem);
+
+			cJSON_AddStringToObject(volumeItem, "Volume", Ucs2ToUtf8(p->VolPath));
+			cJSON_AddNumberToObject(volumeItem, "StartLBA", p->StartLba);
+			cJSON_AddNumberToObject(volumeItem, "PartitionNumber", p->PartNum);
+			cJSON_AddStringToObject(volumeItem, "PartitionType", Ucs2ToUtf8(p->PartType));
+			cJSON_AddStringToObject(volumeItem, "PartitionID", Ucs2ToUtf8(p->PartId));
+			cJSON_AddStringToObject(volumeItem, "BootIndicator", p->BootIndicator ? "Yes" : "No");
+			cJSON_AddStringToObject(volumeItem, "PartitionFlag", Ucs2ToUtf8(p->PartFlag));
+			cJSON_AddStringToObject(volumeItem, "Label", Ucs2ToUtf8(p->VolLabel));
+			cJSON_AddStringToObject(volumeItem, "FS", Ucs2ToUtf8(p->VolFs));
+			cJSON_AddStringToObject(volumeItem, "FreeSpace", GetHumanSize(p->VolFreeSpace.QuadPart, 1024));
+			cJSON_AddStringToObject(volumeItem, "TotalSpace", GetHumanSize(p->VolTotalSpace.QuadPart, 1024));
+			cJSON_AddNumberToObject(volumeItem, "Usage", p->VolUsage);
+			cJSON_AddStringToObject(volumeItem, "MountPoint", "");
+
+			XString mountPoint = xs_new("");
 			for (WCHAR* q = p->VolNames; q[0] != L'\0'; q += wcslen(q) + 1)
 			{
-				printf("%s", Ucs2ToUtf8(q));
+				xs_append_format(&mountPoint, "%s", Ucs2ToUtf8(q));
 			}
-			printf("\"\n");
-			printf("                }%s\n", (j + 1) < pdInfo[i].VolCount ? "," : "");
+			cJSON_AddStringToObject(volumeItem, "MountPoint", mountPoint.data);
+			xs_free(&mountPoint);
 		}
-
-		printf("            ]\n");
-		printf("%s", (i + 1) < dwCount ? "        },\n" : "        }\n");
-
-		cJSON_AddItemToArray(physicalDriveList, physicalDriveItem);
 	}
-	printf("    ]\n");
-	printf("}\n");
 
 	cdi_destroy_smart(cdiSmart);
 	DestoryDriveInfoList(pdInfo, dwCount);
