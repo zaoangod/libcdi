@@ -325,14 +325,14 @@ int main(int argc, char* argv[])
 		{
 			DISK_VOL_INFO* p = &pdInfo[i].VolInfo[j];
 
-			char startLba[21];
-			uint64_to_string(p->StartLba, startLba, sizeof(startLba));
+			// char startLba[21];
+			// uint64_to_string(p->StartLba, startLba, sizeof(startLba));
 
 			cJSON *volumeItem = cJSON_CreateObject();
 			cJSON_AddItemToArray(volumeList, volumeItem);
 
 			cJSON_AddStringToObject(volumeItem, "Volume", Ucs2ToUtf8(p->VolPath));
-			cJSON_AddNumberToObject(volumeItem, "StartLBA", startLba);
+			// cJSON_AddNumberToObject(volumeItem, "StartLBA", startLba);
 			// cJSON_AddNumberToObject(volumeItem, "PartitionNumber", p->PartNum);
 			cJSON_AddStringToObject(volumeItem, "PartitionType", Ucs2ToUtf8(p->PartType));
 			cJSON_AddStringToObject(volumeItem, "PartitionID", Ucs2ToUtf8(p->PartId));
@@ -343,14 +343,15 @@ int main(int argc, char* argv[])
 			cJSON_AddStringToObject(volumeItem, "FreeSpace", GetHumanSize(p->VolFreeSpace.QuadPart, 1024));
 			cJSON_AddStringToObject(volumeItem, "TotalSpace", GetHumanSize(p->VolTotalSpace.QuadPart, 1024));
 			// cJSON_AddNumberToObject(volumeItem, "Usage", p->VolUsage);
+			cJSON_AddStringToObject(volumeItem, "MountPoint", p->VolNames);
 
-			XString mountPoint = xs_new("");
-			for (WCHAR* q = p->VolNames; q[0] != L'\0'; q += wcslen(q) + 1)
-			{
-				xs_append_format(&mountPoint, "%s", Ucs2ToUtf8(q));
-			}
-			cJSON_AddStringToObject(volumeItem, "MountPoint", mountPoint.data);
-			xs_free(&mountPoint);
+			// XString mountPoint = xs_new("");
+			// for (WCHAR* q = p->VolNames; q[0] != L'\0'; q += wcslen(q) + 1)
+			// {
+			// 	xs_append_format(&mountPoint, "%s", Ucs2ToUtf8(q));
+			// }
+			// cJSON_AddStringToObject(volumeItem, "MountPoint", mountPoint.data);
+			// xs_free(&mountPoint);
 		}
 	}
 
