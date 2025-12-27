@@ -34,45 +34,45 @@ PrintSmartInfo(CDI_SMART* cdiSmart, PHY_DRIVE_INFO* pdInfo, INT nIndex)
 
 	if (nIndex < 0)
 	{
-		printf("            \"SSD\": \"%s\",\n", pdInfo->Ssd ? "\"Yes\"" : "\"No\"");
-		printf("            \"Serial\": \"%s\",\n", pdInfo->SerialNumber);
+		printf("            \"SSD\"", pdInfo->Ssd ? "\"Yes\"" : "\"No\"");
+		printf("            \"Serial\"", pdInfo->SerialNumber);
 		return;
 	}
 
 	cdi_update_smart(cdiSmart, nIndex);
 
 	ssd = cdi_get_bool(cdiSmart, nIndex, CDI_BOOL_SSD);
-	printf("            \"SSD\": \"%s\",\n", ssd ? "\"Yes\"" : "\"No\"");
+	printf("            \"SSD\"", ssd ? "\"Yes\"" : "\"No\"");
 
 	str = cdi_get_string(cdiSmart, nIndex, CDI_STRING_SN);
-	printf("            \"Serial\": \"%s\",\n", Ucs2ToUtf8(str));
+	printf("            \"Serial\"", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
 	str = cdi_get_string(cdiSmart, nIndex, CDI_STRING_FIRMWARE);
-	printf("            \"Firmware\": \"%s\",\n", Ucs2ToUtf8(str));
+	printf("            \"Firmware\"", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
 	str = cdi_get_string(cdiSmart, nIndex, CDI_STRING_INTERFACE);
-	printf("            \"Interface\": \"%s\",\n", Ucs2ToUtf8(str));
+	printf("            \"Interface\"", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
 	str = cdi_get_string(cdiSmart, nIndex, CDI_STRING_TRANSFER_MODE_CUR);
-	printf("            \"CurrentTransferMode\": \"%s\",\n", Ucs2ToUtf8(str));
+	printf("            \"CurrentTransferMode\"", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
 	str = cdi_get_string(cdiSmart, nIndex, CDI_STRING_TRANSFER_MODE_MAX);
-	printf("            \"MaxTransferMode\": \"%s\",\n", Ucs2ToUtf8(str));
+	printf("            \"MaxTransferMode\"", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
 	str = cdi_get_string(cdiSmart, nIndex, CDI_STRING_FORM_FACTOR);
-	printf("            \"FormFactor\": \"%s\",\n", Ucs2ToUtf8(str));
+	printf("            \"FormFactor\"", Ucs2ToUtf8(str));
 	cdi_free_string(str);
 
 	d = cdi_get_int(cdiSmart, nIndex, CDI_INT_LIFE);
 	if (d >= 0)
 		printf("            \"HealthStatus\": \"%s (%d%%)\",\n", cdi_get_health_status(cdi_get_int(cdiSmart, nIndex, CDI_INT_DISK_STATUS)), d);
 	else
-		printf("            \"HealthStatus\": \"%s\",\n", cdi_get_health_status(cdi_get_int(cdiSmart, nIndex, CDI_INT_DISK_STATUS)));
+		printf("            \"HealthStatus\"", cdi_get_health_status(cdi_get_int(cdiSmart, nIndex, CDI_INT_DISK_STATUS)));
 
 	printf("            \"Temperature:\" \"%d (C)\",\n", cdi_get_int(cdiSmart, nIndex, CDI_INT_TEMPERATURE));
 
@@ -126,6 +126,8 @@ int main(int argc, char* argv[])
 	for (DWORD i = 0; i < dwCount; i++)
 	{
 		cJSON *physicalDriveItem = cJSON_CreateObject();
+		cJSON_AddItemToArray(physicalDriveList, physicalDriveItem);
+
 		cJSON_AddNumberToObject(physicalDriveItem, "Index", pdInfo[i].Index);
 		cJSON_AddStringToObject(physicalDriveItem, "HWID", Ucs2ToUtf8(pdInfo[i].HwID));
 		cJSON_AddStringToObject(physicalDriveItem, "Model", Ucs2ToUtf8(pdInfo[i].HwName));
@@ -139,23 +141,20 @@ int main(int argc, char* argv[])
 
 		printf("        {\n");
 		printf("            \"Index\": %lu,\n", pdInfo[i].Index);
-		printf("            \"HWID\": \"%s\",\n", Ucs2ToUtf8(pdInfo[i].HwID));
-		printf("            \"Model\": \"%s\",\n", Ucs2ToUtf8(pdInfo[i].HwName));
-		printf("            \"Size\": \"%s\",\n", GetHumanSize(pdInfo[i].SizeInBytes, 1024));
-		printf("            \"RemovableMedia\": \"%s\",\n", pdInfo[i].RemovableMedia ? "Yes" : "No");
-		printf("            \"VendorId\": \"%s\",\n", pdInfo[i].VendorId);
-		printf("            \"ProductId\": \"%s\",\n", pdInfo[i].ProductId);
-		printf("            \"ProductRev\": \"%s\",\n", pdInfo[i].ProductRev);
-		printf("            \"BusType\": \"%s\",\n", GetBusTypeName(pdInfo[i].BusType));
-		printf("            \"PartitionTable\": \"%s\",\n", GetPartMapName(pdInfo[i].PartMap));
+		printf("            \"HWID\"", Ucs2ToUtf8(pdInfo[i].HwID));
+		printf("            \"Model\"", Ucs2ToUtf8(pdInfo[i].HwName));
+		printf("            \"Size\"", GetHumanSize(pdInfo[i].SizeInBytes, 1024));
+		printf("            \"RemovableMedia\"", pdInfo[i].RemovableMedia ? "Yes" : "No");
+		printf("            \"VendorId\"", pdInfo[i].VendorId);
+		printf("            \"ProductId\"", pdInfo[i].ProductId);
+		printf("            \"ProductRev\"", pdInfo[i].ProductRev);
+		printf("            \"BusType\"", GetBusTypeName(pdInfo[i].BusType));
+		printf("            \"PartitionTable\"", GetPartMapName(pdInfo[i].PartMap));
 		switch(pdInfo[i].PartMap)
 		{
 		case PARTITION_STYLE_MBR:
 			char mbr_signature[32] = {0};
-			sprintf_s(
-				mbr_signature,
-				sizeof(mbr_signature),
-				"%02X %02X %02X %02X",
+			sprintf_s(mbr_signature, sizeof(mbr_signature), "%02X %02X %02X %02X",
 				pdInfo[i].MbrSignature[0],
 				pdInfo[i].MbrSignature[1],
 				pdInfo[i].MbrSignature[2],
@@ -165,10 +164,7 @@ int main(int argc, char* argv[])
 			break;
 		case PARTITION_STYLE_GPT:
 			char gpt_guid[64] = {0};
-			sprintf_s(
-				gpt_guid,
-				sizeof(gpt_guid),
-				"{%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X}",
+			sprintf_s(gpt_guid, sizeof(gpt_guid), "{%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X}",
 				pdInfo[i].GptGuid[0],
 				pdInfo[i].GptGuid[1],
 				pdInfo[i].GptGuid[2],
@@ -193,37 +189,33 @@ int main(int argc, char* argv[])
 		PrintSmartInfo(cdiSmart, &pdInfo[i], GetSmartIndex(cdiSmart, pdInfo[i].Index));
 
 		printf("            \"VolumeList\": [\n");
+		cJSON *volumeList = cJSON_CreateArray();
+
 		for (DWORD j = 0; j < pdInfo[i].VolCount; j++)
 		{
-			printf("                {\n");
-
 			DISK_VOL_INFO* p = &pdInfo[i].VolInfo[j];
-			// printf("\t%s\n", Ucs2ToUtf8(p->VolPath));
-			printf("                    \"Volume\": \"%s\",\n", Ucs2ToUtf8(p->VolPath));
-			printf("                    \"StartLBA\": %llu,\n", p->StartLba);
-			printf("                    \"PartitionNumber\": %lu\n", p->PartNum);
-			printf("                    \"PartitionType\": \"%s\",\n", Ucs2ToUtf8(p->PartType));
-			printf("                    \"PartitionID\": \"%s\",\n", Ucs2ToUtf8(p->PartId));
-			printf("                    \"BootIndicator\": \"%s\",\n", p->BootIndicator ? "Yes" : "No");
-			printf("                    \"PartitionFlag\": \"%s\",\n", Ucs2ToUtf8(p->PartFlag));
-			printf("                    \"Label\": \"%s\",\n", Ucs2ToUtf8(p->VolLabel));
-			printf("                    \"FS\": \"%s\",\n", Ucs2ToUtf8(p->VolFs));
-			printf("                    \"FreeSpace\": \"%s\",\n", GetHumanSize(p->VolFreeSpace.QuadPart, 1024));
-			printf("                    \"TotalSpace\": \"%s\",\n", GetHumanSize(p->VolTotalSpace.QuadPart, 1024));
-			printf("                    \"Usage\": \"%.2f%%\",\n", p->VolUsage);
-			printf("                    \"MountPoint\": \"");
+
+			cJSON *volumeItem = cJSON_CreateObject();
+			cJSON_AddItemToArray(volumeList, volumeItem);
+			cJSON_AddStringToObject(volumeItem, "Volume", Ucs2ToUtf8(p->VolPath));
+			cJSON_AddNumberToObject(volumeItem, "StartLBA",  p->StartLba);
+			cJSON_AddNumberToObject(volumeItem, "PartitionNumber", p->PartNum);
+			cJSON_AddStringToObject(volumeItem, "PartitionType", Ucs2ToUtf8(p->PartType));
+			cJSON_AddStringToObject(volumeItem, "PartitionID", Ucs2ToUtf8(p->PartId));
+			cJSON_AddStringToObject(volumeItem, "BootIndicator", p->BootIndicator ? "Yes" : "No");
+			cJSON_AddStringToObject(volumeItem, "PartitionFlag", Ucs2ToUtf8(p->PartFlag));
+			cJSON_AddStringToObject(volumeItem, "Label", Ucs2ToUtf8(p->VolLabel));
+			cJSON_AddStringToObject(volumeItem, "FS", Ucs2ToUtf8(p->VolFs));
+			cJSON_AddStringToObject(volumeItem, "FreeSpace", GetHumanSize(p->VolFreeSpace.QuadPart, 1024));
+			cJSON_AddStringToObject(volumeItem, "TotalSpace", GetHumanSize(p->VolTotalSpace.QuadPart, 1024));
+			cJSON_AddStringToObject(volumeItem, "Usage", p->VolUsage);
+			cJSON_AddStringToObject(volumeItem, "MountPoint", "");
+
 			for (WCHAR* q = p->VolNames; q[0] != L'\0'; q += wcslen(q) + 1)
 			{
 				printf("%s", Ucs2ToUtf8(q));
 			}
-			printf("\"\n");
-			printf("                }%s\n", (j + 1) < pdInfo[i].VolCount ? "," : "");
 		}
-
-		printf("            ]\n");
-		printf("%s", (i + 1) < dwCount ? "        },\n" : "        }\n");
-
-		cJSON_AddItemToArray(physicalDriveList, physicalDriveItem);
 	}
 	printf("    ]\n");
 	printf("}\n");
