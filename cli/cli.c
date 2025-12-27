@@ -267,14 +267,19 @@ int main(int argc, char* argv[])
 		switch(pdInfo[i].PartMap)
 		{
 		case PARTITION_STYLE_MBR:
-			XString xs = xs_new("");
-			xs_append_format(&xs, "%02X %02X %02X %02X", pdInfo[i].MbrSignature[0], pdInfo[i].MbrSignature[1], pdInfo[i].MbrSignature[2], pdInfo[i].MbrSignature[3]);
-			cJSON_AddStringToObject(physicalDriveItem, "MbrSignature", xs.data);
-			xs_free(&xs);
+			XString mbrSignature = xs_new("");
+			xs_append_format(&mbrSignature, "%02X %02X %02X %02X",
+				pdInfo[i].MbrSignature[0],
+				pdInfo[i].MbrSignature[1],
+				pdInfo[i].MbrSignature[2],
+				pdInfo[i].MbrSignature[3]
+			);
+			cJSON_AddStringToObject(physicalDriveItem, "MbrSignature", mbrSignature.data);
+			xs_free(&mbrSignature);
 			break;
 		case PARTITION_STYLE_GPT:
-			XString gpt_guid = xs_new("");
-			xs_append_format(&gpt_guid, "{%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X}",
+			XString gptGuid = xs_new("");
+			xs_append_format(&gptGuid, "{%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X}",
 				pdInfo[i].GptGuid[0],
 				pdInfo[i].GptGuid[1],
 				pdInfo[i].GptGuid[2],
@@ -292,8 +297,8 @@ int main(int argc, char* argv[])
 				pdInfo[i].GptGuid[14],
 				pdInfo[i].GptGuid[15]
 			);
-			cJSON_AddStringToObject(physicalDriveItem, "GptGuid", gpt_guid.data);
-			xs_free(&gpt_guid);
+			cJSON_AddStringToObject(physicalDriveItem, "GptGuid", gptGuid.data);
+			xs_free(&gptGuid);
 			break;
 		}
 
