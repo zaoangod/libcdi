@@ -157,27 +157,27 @@ int main(int argc, char* argv[])
 			break;
 		}
 
-		printf("            \"Volume\": [\n");
+		printf("            \"VolumeList\": [\n");
 		PrintSmartInfo(cdiSmart, &pdInfo[i], GetSmartIndex(cdiSmart, pdInfo[i].Index));
 		for (DWORD j = 0; j < pdInfo[i].VolCount; j++)
 		{
-			printf("            {\n");
+			printf("                {\n");
 
 			DISK_VOL_INFO* p = &pdInfo[i].VolInfo[j];
 			// printf("\t%s\n", Ucs2ToUtf8(p->VolPath));
-			printf("                \"Volume\": \"%s\",\n", Ucs2ToUtf8(p->VolPath));
-			printf("                \"StartLBA\": %llu,\n", p->StartLba);
-			printf("                \"PartitionNumber\": %lu\n", p->PartNum);
-			printf("                \"PartitionType\": \"%s\",\n", Ucs2ToUtf8(p->PartType));
-			printf("                \"PartitionID\": \"%s\",\n", Ucs2ToUtf8(p->PartId));
-			printf("                \"BootIndicator\": \"%s\",\n", p->BootIndicator ? "Yes" : "No");
-			printf("                \"PartitionFlag\": \"%s\",\n", Ucs2ToUtf8(p->PartFlag));
-			printf("                \"Label\": \"%s\",\n", Ucs2ToUtf8(p->VolLabel));
-			printf("                \"FS\": \"%s\",\n", Ucs2ToUtf8(p->VolFs));
-			printf("                \"FreeSpace\": \"%s\",\n", GetHumanSize(p->VolFreeSpace.QuadPart, 1024));
-			printf("                \"TotalSpace\": \"%s\",\n", GetHumanSize(p->VolTotalSpace.QuadPart, 1024));
-			printf("                \"Usage\": \"%.2f%%\",\n", p->VolUsage);
-			printf("                \"MountPoint\": \"");
+			printf("                    \"Volume\": \"%s\",\n", Ucs2ToUtf8(p->VolPath));
+			printf("                    \"StartLBA\": %llu,\n", p->StartLba);
+			printf("                    \"PartitionNumber\": %lu\n", p->PartNum);
+			printf("                    \"PartitionType\": \"%s\",\n", Ucs2ToUtf8(p->PartType));
+			printf("                    \"PartitionID\": \"%s\",\n", Ucs2ToUtf8(p->PartId));
+			printf("                    \"BootIndicator\": \"%s\",\n", p->BootIndicator ? "Yes" : "No");
+			printf("                    \"PartitionFlag\": \"%s\",\n", Ucs2ToUtf8(p->PartFlag));
+			printf("                    \"Label\": \"%s\",\n", Ucs2ToUtf8(p->VolLabel));
+			printf("                    \"FS\": \"%s\",\n", Ucs2ToUtf8(p->VolFs));
+			printf("                    \"FreeSpace\": \"%s\",\n", GetHumanSize(p->VolFreeSpace.QuadPart, 1024));
+			printf("                    \"TotalSpace\": \"%s\",\n", GetHumanSize(p->VolTotalSpace.QuadPart, 1024));
+			printf("                    \"Usage\": \"%.2f%%\",\n", p->VolUsage);
+			printf("                    \"MountPoint\": \"");
 			for (WCHAR* q = p->VolNames; q[0] != L'\0'; q += wcslen(q) + 1)
 			{
 				printf("%s", Ucs2ToUtf8(q));
