@@ -3,14 +3,144 @@
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
+#include <string.h>
 
 #include "../cdi/cdi.h"
 #include "disklib.h"
 #include "cJSON.h"
-#include "u_string.h"
 
 #pragma comment(lib, "cdi.lib")
 #pragma comment(lib, "setupapi.lib")
+
+
+// ----------------------------------------------------------------------------------
+// ----------------------------------X-String start----------------------------------
+// ----------------------------------------------------------------------------------
+
+// 默认初始容量
+#define XS_DEFAULT_CAPACITY 256
+
+// 动态字符串结构体（对外暴露，方便用户操作）
+typedef struct XString {
+    char *data; // 字符串数据
+    size_t length; // 有效字符长度（不含'\0'）
+    size_t capacity; // 总容量（含'\0'）
+} XString;
+
+/**
+ * @brief 创建新的动态字符串
+ * @param value 初始字符串（NULL 则创建空字符串）
+ * @return 初始化后的 XString 实例
+ */
+XString xs_new(const char *value) {
+    // 初始化为空
+    XString sb = {NULL, 0, 0};
+    if (value == NULL) {
+        sb.length = 0;
+        sb.capacity = XS_DEFAULT_CAPACITY;
+        sb.data = malloc(sb.capacity * sizeof(char));
+        if (!sb.data) {
+            sb.length = 0;
+            sb.capacity = 0;
+            return sb;
+        }
+        sb.data[0] = '\0';
+        return sb;
+    }
+
+    sb.length = strlen(value);
+    sb.capacity = (sb.length + 1 > XS_DEFAULT_CAPACITY) ? sb.length + 1 : XS_DEFAULT_CAPACITY;
+    sb.data = malloc(sb.capacity * sizeof(char));
+    if (!sb.data) {
+        sb.length = 0;
+        sb.capacity = 0;
+        return sb;
+    }
+
+    strcpy(sb.data, value);
+    return sb;
+}
+
+/**
+ * @brief 确保动态字符串有足够的容量
+ * @param x_string 动态字符串指针
+ * @param new_capacity 所需最小容量
+ * @return 0 成功，-1 失败（参数错误/内存分配失败）
+ */
+int xs_ensure_capacity(XString *x_string, const size_t new_capacity) {
+    if (!x_string || !x_string->data) {
+        return -1;
+    }
+    if (new_capacity > x_string->capacity) {
+        const size_t new_cap = new_capacity + (new_capacity / 2);
+        char *new_data = realloc(x_string->data, new_cap);
+        if (!new_data) {
+            return -1;
+        }
+        x_string->data = new_data;
+        x_string->capacity = new_cap;
+    }
+    return 0;
+}
+
+/**
+ * @brief 追加格式化字符串到动态字符串
+ * @param x_string 动态字符串指针
+ * @param format 格式化字符串
+ * @param ... 可变参数
+ * @return 0 成功，-1 失败
+ */
+int xs_append_format(XString *x_string, const char *format, ...) {
+    if (!x_string || !format) {
+        return -1;
+    }
+
+    va_list args;
+    va_start(args, format);
+
+    int needed_size = vsnprintf(NULL, 0, format, args);
+    va_end(args);
+
+    if (needed_size < 0) {
+        return -1;
+    }
+
+    size_t new_len = x_string->length + needed_size + 1;
+    if (new_len > x_string->capacity) {
+        if (xs_ensure_capacity(x_string, new_len) != 0) {
+            return -1;
+        }
+    }
+
+    va_start(args, format);
+    int result = vsnprintf(x_string->data + x_string->length, needed_size + 1, format, args);
+    va_end(args);
+
+    if (result < 0) {
+        return -1;
+    }
+
+    x_string->length += needed_size;
+
+    return 0;
+}
+
+/**
+ * @brief 释放动态字符串内存
+ * @param x_string 动态字符串指针
+ */
+void xs_free(XString *x_string) {
+    if (x_string && x_string->data) {
+        free(x_string->data);
+        x_string->data = NULL;
+        x_string->length = 0;
+        x_string->capacity = XS_DEFAULT_CAPACITY;
+    }
+}
+// --------------------------------------------------------------------------------
+// ----------------------------------X-String end----------------------------------
+// --------------------------------------------------------------------------------
 
 static INT
 GetSmartIndex(CDI_SMART* cdiSmart, DWORD dwId)
@@ -200,15 +330,13 @@ int main(int argc, char* argv[])
 			// cJSON_AddStringToObject(volumeItem, "TotalSpace", GetHumanSize(p->VolTotalSpace.QuadPart, 1024));
 			// cJSON_AddNumberToObject(volumeItem, "Usage", p->VolUsage);
 
-			UString *mountPointValue;
-			u_string_new(mountPointValue);
+			XString xs = xs_new("");
 			for (WCHAR* q = p->VolNames; q[0] != L'\0'; q += wcslen(q) + 1)
 			{
-				u_string_join(mountPointValue, "%s", Ucs2ToUtf8(q));
-				// printf("%s", Ucs2ToUtf8(q));
+				xs_append_format(&xs, "%s", Ucs2ToUtf8(q));
 			}
-			cJSON_AddStringToObject(volumeItem, "MountPoint", u_string_body(mountPointValue));
-			u_string_free(mountPointValue);
+			cJSON_AddStringToObject(volumeItem, "MountPoint", xs.data);
+			xs_free(&xs);
 		}
 	}
 	printf("    ]\n");
