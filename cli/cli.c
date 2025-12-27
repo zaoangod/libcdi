@@ -32,7 +32,7 @@ PrintSmartInfo(CDI_SMART* cdiSmart, PHY_DRIVE_INFO* pdInfo, INT nIndex)
 	WCHAR* str;
 	BOOL ssd;
 	BYTE id;
-
+	return;
 	if (nIndex < 0)
 	{
 		printf("            \"SSD\"", pdInfo->Ssd ? "\"Yes\"" : "\"No\"");
