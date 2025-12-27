@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <stdint.h>
+#include <inttypes.h>
 
 #include "../cdi/cdi.h"
 #include "disklib.h"
@@ -147,9 +149,9 @@ void xs_free(XString *x_string) {
 // ----------------------------------convert start----------------------------------
 // ---------------------------------------------------------------------------------
 // 封装成通用函数：输入UINT64值，输出字符串缓冲区
-// void uint64_to_string(uint64_t num, char *result, size_t buffer_size) {
-// 	snprintf(result, buffer_size, "%" PRIu64, num);
-// }
+void uint64_to_string(uint64_t num, char *result, size_t buffer_size) {
+	snprintf(result, buffer_size, "%" PRIu64, num);
+}
 // -------------------------------------------------------------------------------
 // ----------------------------------convert end----------------------------------
 // -------------------------------------------------------------------------------
