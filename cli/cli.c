@@ -67,14 +67,15 @@ PrintSmartInfo(CDI_SMART* cdiSmart, PHY_DRIVE_INFO* pdInfo, INT nIndex)
 
 	d = cdi_get_int(cdiSmart, nIndex, CDI_INT_LIFE);
 	if (d >= 0)
-		printf("            \"HealthStatus\": \"%s (%d%%)\n\",", cdi_get_health_status(cdi_get_int(cdiSmart, nIndex, CDI_INT_DISK_STATUS)), d);
+		printf("            \"HealthStatus\": \"%s (%d%%)\",\n", cdi_get_health_status(cdi_get_int(cdiSmart, nIndex, CDI_INT_DISK_STATUS)), d);
 	else
-		printf("            \"HealthStatus\": \"%s\n\",", cdi_get_health_status(cdi_get_int(cdiSmart, nIndex, CDI_INT_DISK_STATUS)));
+		printf("            \"HealthStatus\": \"%s\",\n", cdi_get_health_status(cdi_get_int(cdiSmart, nIndex, CDI_INT_DISK_STATUS)));
 
-	printf("            \"Temperature:\" \"%d(C)\"\n", cdi_get_int(cdiSmart, nIndex, CDI_INT_TEMPERATURE));
+	printf("            \"Temperature:\" \"%d (C)\"\n", cdi_get_int(cdiSmart, nIndex, CDI_INT_TEMPERATURE));
 
 	str = cdi_get_smart_format(cdiSmart, nIndex);
-	printf("            \"Status%s\": \n", Ucs2ToUtf8(str));
+	Ucs2ToUtf8(str);
+	printf("            \"StatusRawValue\": ");
 	cdi_free_string(str);
 
 	n = cdi_get_dword(cdiSmart, nIndex, CDI_DWORD_ATTR_COUNT);
@@ -156,10 +157,11 @@ int main(int argc, char* argv[])
 			break;
 		}
 
+		printf("            \"Volume\": [\n");
 		PrintSmartInfo(cdiSmart, &pdInfo[i], GetSmartIndex(cdiSmart, pdInfo[i].Index));
 		for (DWORD j = 0; j < pdInfo[i].VolCount; j++)
 		{
-			printf("            \"Volume\": {\n");
+			printf("            {\n");
 
 			DISK_VOL_INFO* p = &pdInfo[i].VolInfo[j];
 			// printf("\t%s\n", Ucs2ToUtf8(p->VolPath));
@@ -183,6 +185,8 @@ int main(int argc, char* argv[])
 			printf("\"\n");
 			printf("            }%s\n", j < pdInfo[i].VolCount ? "," : "");
 		}
+
+		printf("            ]\n");
 		printf("%s", i < dwCount ? "    },\n" : "}\n");
 	}
 	printf("    ]\n");
